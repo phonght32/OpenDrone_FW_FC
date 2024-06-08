@@ -28,3 +28,6 @@
 [submodule "Algorithm/pid_controller"]
 	path = Algorithm/pid_controller
 	url = git@github.com:phonght32/pid_controller.git
+[submodule "TxProtocol/OpenDrone_TxProto"]
+	path = TxProtocol/OpenDrone_TxProto
+	url = git@github.com:phonght32/OpenDrone_TxProto.git
