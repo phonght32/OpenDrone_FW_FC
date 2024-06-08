@@ -1,0 +1,33 @@
+[submodule "Sensor/bmp180"]
+	path = Sensor/bmp180
+	url = git@github.com:phonght32/bmp180.git
+[submodule "Sensor/bmp280"]
+	path = Sensor/bmp280
+	url = git@github.com:phonght32/bmp280.git
+[submodule "EscProtocol/esc_dshot"]
+	path = EscProtocol/esc_dshot
+	url = git@github.com:phonght32/esc_dshot.git
+[submodule "Sensor/hmc5883l"]
+	path = Sensor/hmc5883l
+	url = git@github.com:phonght32/hmc5883l.git
+[submodule "Filter/imu_madgwick"]
+	path = Filter/imu_madgwick
+	url = git@github.com:phonght32/imu_madgwick.git
+[submodule "OSD/max7456"]
+	path = OSD/max7456
+	url = git@github.com:phonght32/max7456.git
+[submodule "Sensor/mpu6050"]
+	path = Sensor/mpu6050
+	url = git@github.com:phonght32/mpu6050.git
+[submodule "Radio/nrf24l01"]
+	path = Radio/nrf24l01
+	url = git@github.com:phonght32/nrf24l01.git
+[submodule "Radio/sx1278"]
+	path = Radio/sx1278
+	url = git@github.com:phonght32/sx1278.git
+[submodule "Algorithm/pid_controller"]
+	path = Algorithm/pid_controller
+	url = git@github.com:phonght32/pid_controller.git
+[submodule "Portable/mcu_port"]
+	path = Portable/mcu_port
+	url = git@github.com:phonght32/mcu_port.git
