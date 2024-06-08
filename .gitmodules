@@ -28,6 +28,3 @@
 [submodule "Algorithm/pid_controller"]
 	path = Algorithm/pid_controller
 	url = git@github.com:phonght32/pid_controller.git
-[submodule "Portable/mcu_port"]
-	path = Portable/mcu_port
-	url = git@github.com:phonght32/mcu_port.git
