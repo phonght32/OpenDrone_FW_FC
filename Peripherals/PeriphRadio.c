@@ -2,7 +2,7 @@
 #include "Periph.h"
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
-#include "OpenDrone_TxProto.h"
+#include "OpenDrone_TxProtocol.h"
 #include "nrf24l01.h"
 #include "sx1278.h"
 
@@ -69,17 +69,17 @@ err_code_t PeriphRadio_Receive(uint8_t *data)
 {
 #ifdef USE_NRF24L01
 	uint8_t irq_level;
-	OpenDrone_TxProto_Msg_t OpenDrone_TxProto_Msg;
+	OpenDrone_TxProtocol_Msg_t OpenDrone_TxProtocol_Msg;
 
 	hw_intf_nrf24l01_get_irq(&irq_level);
 
 	if (irq_level == NRF24L01_IRQ_ACTIVE_LEVEL)
 	{
-		nrf24l01_receive(nrf24l01_handle, (uint8_t *)&OpenDrone_TxProto_Msg);
+		nrf24l01_receive(nrf24l01_handle, (uint8_t *)&OpenDrone_TxProtocol_Msg);
 
-		if (OpenDrone_TxProto_Msg.MsgId != OPENDRONE_TXPROTO_MSG_ID_INVALID)
+		if (OpenDrone_TxProtocol_Msg.MsgId != OPENDRONE_TXPROTOCOL_MSG_ID_INVALID)
 		{
-			memcpy(data, (uint8_t *)&OpenDrone_TxProto_Msg, CONFIG_NRF24L01_PAYLOAD_LEN);
+			memcpy(data, (uint8_t *)&OpenDrone_TxProtocol_Msg, CONFIG_NRF24L01_PAYLOAD_LEN);
 			nrf24l01_clear_rx_dr(nrf24l01_handle);
 		}
 	}

@@ -4,7 +4,7 @@
 #include "OpenDrone_FC_Define.h"
 #include "HwIntf/OpenDrone_FC_HwIntf.h"
 #include "Peripherals/Periph.h"
-#include "TxProtocol/OpenDrone_TxProto/OpenDrone_TxProto.h"
+#include "TxProtocol/OpenDrone_TxProtocol/OpenDrone_TxProtocol.h"
 
 #define PRINT_ANGLE
 
@@ -28,7 +28,7 @@ uint16_t task_freq[NUM_OF_TASK];
 #endif
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
-OpenDrone_TxProto_Msg_t OpenDrone_TxProto_Msg = {0};
+OpenDrone_TxProtocol_Msg_t OpenDrone_TxProtocol_Msg = {0};
 
 err_code_t OpenDrone_FC_Init(void)
 {
@@ -86,7 +86,7 @@ err_code_t OpenDrone_FC_Main(void)
 	/* Task 50 Hz */
 	if ((current_time - last_time_us[IDX_TASK_50_HZ]) > FREQ_50_HZ_TIME_US)
 	{
-		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProto_Msg);
+		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
 #ifdef USE_SERIAL_DEBUG
 		task_freq[IDX_TASK_50_HZ] = TIME_US_TO_FREQ_HZ(current_time - last_time_us[IDX_TASK_50_HZ]);
@@ -121,10 +121,10 @@ err_code_t OpenDrone_FC_Main(void)
 #endif
 
 		sprintf((char *)log_buf, "\r\nthrottle: %03d \troll: %03d \tpitch: %03d \tyaw: %03d",
-		        OpenDrone_TxProto_Msg.Payload.StabilizerCtrl.throttle,
-		        OpenDrone_TxProto_Msg.Payload.StabilizerCtrl.roll,
-		        OpenDrone_TxProto_Msg.Payload.StabilizerCtrl.pitch,
-		        OpenDrone_TxProto_Msg.Payload.StabilizerCtrl.yaw);
+		        OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle,
+				OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.roll,
+				OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.pitch,
+				OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.yaw);
 
 		hw_intf_uart_debug_send(log_buf, 50);
 #endif
