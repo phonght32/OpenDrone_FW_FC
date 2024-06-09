@@ -39,6 +39,22 @@ extern "C" {
 #include "Sensor/mpu6050/mpu6050.h"
 #include "TxProtocol/OpenDrone_TxProto/OpenDrone_TxProto.h"
 
+err_code_t PeriphIMU_Init(void);
+err_code_t PeriphIMU_UpdateAccel(void);
+err_code_t PeriphIMU_UpdateGyro(void);
+err_code_t PeriphIMU_UpdateMag(void);
+err_code_t PeriphIMU_UpdateFilter(void);
+err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw);
+
+err_code_t PeriphController_Init(void);
+
+err_code_t PeriphEsc_Init(void);
+err_code_t PeriphEsc_PreparePacket(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle);
+err_code_t PeriphEsc_Send(void);
+
+err_code_t PeriphRadio_Init(void);
+err_code_t PeriphRadio_Receive(uint8_t *data);
+
 #ifdef __cplusplus
 }
 #endif
