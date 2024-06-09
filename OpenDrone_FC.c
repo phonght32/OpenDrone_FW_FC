@@ -2,9 +2,10 @@
 
 #include "OpenDrone_FC.h"
 #include "OpenDrone_FC_Define.h"
-#include "HwIntf/OpenDrone_FC_HwIntf.h"
-#include "Peripherals/Periph.h"
-#include "TxProtocol/OpenDrone_TxProtocol/OpenDrone_TxProtocol.h"
+#include "OpenDrone_FC_HwIntf.h"
+#include "OpenDrone_TxProtocol.h"
+#include "Periph.h"
+
 
 #define PRINT_ANGLE
 
