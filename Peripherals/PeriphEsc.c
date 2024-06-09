@@ -1,3 +1,4 @@
+#include "Periph.h"
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
 #include "esc_dshot.h"

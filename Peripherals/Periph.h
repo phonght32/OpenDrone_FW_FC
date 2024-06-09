@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef __OPENDRONE_FC_H__
-#define __OPENDRONE_FC_H__
+#ifndef __PERIPH_H__
+#define __PERIPH_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,11 +29,24 @@ extern "C" {
 
 #include "err_code.h"
 
-err_code_t OpenDrone_FC_Init(void);
-err_code_t OpenDrone_FC_Main(void);
+err_code_t PeriphIMU_Init(void);
+err_code_t PeriphIMU_UpdateAccel(void);
+err_code_t PeriphIMU_UpdateGyro(void);
+err_code_t PeriphIMU_UpdateMag(void);
+err_code_t PeriphIMU_UpdateFilter(void);
+err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw);
+
+err_code_t PeriphController_Init(void);
+
+err_code_t PeriphEsc_Init(void);
+err_code_t PeriphEsc_PreparePacket(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle);
+err_code_t PeriphEsc_Send(void);
+
+err_code_t PeriphRadio_Init(void);
+err_code_t PeriphRadio_Receive(uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __OPENDRONE_FC_H__ */
+#endif /* __PERIPH_H__ */
