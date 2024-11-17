@@ -19,10 +19,7 @@ typedef struct {
 	float mag_z;
 } imu_data_t;
 
-imu_data_t imu_data_sum = {0};
-uint8_t num_accel_samples = 0;
-uint8_t num_gyro_samples = 0;
-uint8_t num_mag_samples = 0;
+imu_data_t imu_data = {0};
 
 #ifdef USE_MPU6050
 mpu6050_handle_t mpu6050_handle;
@@ -105,11 +102,9 @@ err_code_t PeriphIMU_UpdateAccel(void)
 	}
 #endif
 
-	imu_data_sum.accel_x += accel_x;
-	imu_data_sum.accel_y += accel_y;
-	imu_data_sum.accel_z += accel_z;
-
-	num_accel_samples += 1;
+	imu_data.accel_x = accel_x;
+	imu_data.accel_y = accel_y;
+	imu_data.accel_z = accel_z;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -127,11 +122,9 @@ err_code_t PeriphIMU_UpdateGyro(void)
 	}
 #endif
 
-	imu_data_sum.gyro_x += gyro_x;
-	imu_data_sum.gyro_y += gyro_y;
-	imu_data_sum.gyro_z += gyro_z;
-
-	num_gyro_samples += 1;
+	imu_data.gyro_x = gyro_x;
+	imu_data.gyro_y = gyro_y;
+	imu_data.gyro_z = gyro_z;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -144,34 +137,11 @@ err_code_t PeriphIMU_UpdateMag(void)
 err_code_t PeriphIMU_UpdateFilter(void)
 {
 	err_code_t err_ret;
-	float accel_x = 0, accel_y = 0, accel_z = 0, gyro_x = 0, gyro_y = 0, gyro_z = 0;
-
-	if (num_accel_samples != 0)
-	{
-		accel_x = imu_data_sum.accel_x / num_accel_samples;
-		accel_y = imu_data_sum.accel_y / num_accel_samples;
-		accel_z = imu_data_sum.accel_z / num_accel_samples;
-
-		num_accel_samples = 0;
-		imu_data_sum.accel_x = 0;
-		imu_data_sum.accel_y = 0;
-		imu_data_sum.accel_z = 0;
-	}
-
-	if (num_gyro_samples != 0)
-	{
-		gyro_x = imu_data_sum.gyro_x / num_gyro_samples;
-		gyro_y = imu_data_sum.gyro_y / num_gyro_samples;
-		gyro_z = imu_data_sum.gyro_z / num_gyro_samples;
-
-		num_gyro_samples = 0;
-		imu_data_sum.gyro_x = 0;
-		imu_data_sum.gyro_y = 0;
-		imu_data_sum.gyro_z = 0;
-	}
 
 #ifdef USE_IMU_MADGWICK_6DOF
-	err_ret = imu_madgwick_update_6dof(imu_madgwick_handle, gyro_x, gyro_y, gyro_z, accel_x, accel_y, accel_z);
+	err_ret = imu_madgwick_update_6dof(imu_madgwick_handle,
+	                                   imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
+	                                   imu_data.accel_x, imu_data.accel_y, imu_data.accel_z);
 	if (err_ret != ERR_CODE_SUCCESS)
 	{
 		return err_ret;

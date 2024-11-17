@@ -33,7 +33,7 @@ extern "C" {
 // #define USE_SX1278
 
 #define USE_MPU6050
-// #define USE_HMC5883L
+#define USE_HMC5883L
 
 #define USE_ESC_DSHOT
 
@@ -79,7 +79,7 @@ extern "C" {
 #define CONFIG_ESC_DSHOT_TYPE  				ESC_DSHOT_TYPE_600
 
 #define CONFIG_IMU_MADGWICK_BETA  			0.1f
-#define CONFIG_IMU_MADGWICK_SAMPLE_FREQ  	28000
+#define CONFIG_IMU_MADGWICK_SAMPLE_FREQ  	15000
 
 #define CONFIG_PID_CONTROLLER_KP  			0
 #define CONFIG_PID_CONTROLLER_KI  			0
