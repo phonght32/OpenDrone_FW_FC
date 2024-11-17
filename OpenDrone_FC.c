@@ -39,7 +39,7 @@ err_code_t OpenDrone_FC_Init(void)
 	hw_intf_uart_debug_send(log_buf, 30);
 #endif
 
-	PeriphRadio_Init();
+	// PeriphRadio_Init();
 #ifdef USE_SERIAL_DEBUG
 	sprintf((char *)log_buf, "\r\nInit peripheral RADIO complete");
 	hw_intf_uart_debug_send(log_buf, 32);
@@ -87,7 +87,7 @@ err_code_t OpenDrone_FC_Main(void)
 	/* Task 50 Hz */
 	if ((current_time - last_time_us[IDX_TASK_50_HZ]) >= FREQ_50_HZ_TIME_US)
 	{
-		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
+		// PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
 #ifdef USE_SERIAL_DEBUG
 		task_freq[IDX_TASK_50_HZ] = TIME_US_TO_FREQ_HZ(current_time - last_time_us[IDX_TASK_50_HZ]);
