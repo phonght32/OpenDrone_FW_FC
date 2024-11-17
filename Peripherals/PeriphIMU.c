@@ -74,6 +74,7 @@ err_code_t PeriphIMU_Init(void)
 	};
 	hmc5883l_set_config(hmc5883l_handle, hmc5883l_cfg);
 	hmc5883l_config(hmc5883l_handle);
+	hmc5883l_auto_calib(hmc5883l_handle);
 #endif
 
 #ifdef USE_IMU_MADGWICK_6DOF
