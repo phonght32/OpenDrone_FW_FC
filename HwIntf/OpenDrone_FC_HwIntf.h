@@ -63,6 +63,11 @@ err_code_t hw_intf_hmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t le
 err_code_t hw_intf_hmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
 #endif
 
+#ifdef USE_QMC5883L
+err_code_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+err_code_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+#endif
+
 #ifdef USE_ESC_DSHOT
 err_code_t hw_intf_fl_esc_dshot_set_auto_reload(uint32_t auto_reload);
 err_code_t hw_intf_fr_esc_dshot_set_auto_reload(uint32_t auto_reload);

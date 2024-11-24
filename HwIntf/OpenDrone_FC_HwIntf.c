@@ -95,6 +95,18 @@ __weak err_code_t hw_intf_hmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint
 }
 #endif
 
+#ifdef USE_QMC5883L
+__weak err_code_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+{
+	return ERR_CODE_SUCCESS;
+}
+
+__weak err_code_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+{
+	return ERR_CODE_SUCCESS;
+}
+#endif
+
 #ifdef USE_ESC_DSHOT
 __weak err_code_t hw_intf_fl_esc_dshot_set_auto_reload(uint32_t auto_reload)
 {

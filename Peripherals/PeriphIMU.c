@@ -3,6 +3,7 @@
 #include "OpenDrone_FC_HwIntf.h"
 #include "mpu6050.h"
 #include "hmc5883l.h"
+#include "qmc5883l.h"
 #include "imu_madgwick.h"
 
 #define MAX_IMU_SAMPLES  	10
@@ -27,6 +28,10 @@ mpu6050_handle_t mpu6050_handle;
 
 #ifdef USE_HMC5883L
 hmc5883l_handle_t hmc5883l_handle;
+#endif
+
+#ifdef USE_QMC5883L
+qmc5883l_handle_t qmc5883l_handle;
 #endif
 
 #ifdef USE_IMU_MADGWICK_6DOF
@@ -75,6 +80,9 @@ err_code_t PeriphIMU_Init(void)
 	hmc5883l_set_config(hmc5883l_handle, hmc5883l_cfg);
 	hmc5883l_config(hmc5883l_handle);
 	hmc5883l_auto_calib(hmc5883l_handle);
+#endif
+
+#ifdef USE_QMC5883L
 #endif
 
 #ifdef USE_IMU_MADGWICK_6DOF
