@@ -99,6 +99,7 @@ err_code_t OpenDrone_FC_Main(void)
 	/* Task 5 Hz */
 	if ((current_time - last_time_us[IDX_TASK_5_HZ]) >= FREQ_5_HZ_TIME_US)
 	{
+		PeriphIMU_UpdateMag();
 #ifdef USE_SERIAL_DEBUG
 
 #ifdef PRINT_ANGLE
