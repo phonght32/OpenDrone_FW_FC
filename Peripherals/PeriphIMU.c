@@ -83,6 +83,23 @@ err_code_t PeriphIMU_Init(void)
 #endif
 
 #ifdef USE_QMC5883L
+	qmc5883l_handle = qmc5883l_init();
+	qmc5883l_cfg_t qmc5883l_cfg = {
+		.range 			= CONFIG_QMC5883L_RANGE,
+		.opr_mode 		= CONFIG_QMC5883L_OPR_MODE,
+		.data_rate 		= CONFIG_QMC5883L_DATA_RATE,
+		.sample_rate 	= CONFIG_QMC5883L_SAMPLES,
+		.intr_en 		= CONFIG_QMC5883L_INTR_ENABLE,
+		.mag_bias_x 	= 0,
+		.mag_bias_y 	= 0,
+		.mag_bias_z 	= 0,
+		.i2c_send 		= hw_intf_qmc5883l_i2c_send,
+		.i2c_recv 		= hw_intf_qmc5883l_i2c_recv,
+		.delay 			= HAL_Delay
+	};
+	qmc5883l_set_config(qmc5883l_handle, qmc5883l_cfg);
+	qmc5883l_config(qmc5883l_handle);
+//	qmc5883l_auto_calib(qmc5883l_handle);
 #endif
 
 #ifdef USE_IMU_MADGWICK_6DOF
@@ -140,6 +157,18 @@ err_code_t PeriphIMU_UpdateGyro(void)
 
 err_code_t PeriphIMU_UpdateMag(void)
 {
+	err_code_t err_ret;
+	int16_t mag_x = 0, max_y = 0, mag_z = 0;
+	uint8_t log_buf[50] = {0};
+
+#ifdef USE_QMC5883L
+	HAL_Delay(100);
+	qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
+
+ 	sprintf((char *)log_buf, "%i\t%i\t%i \r\n", mag_x, max_y, mag_z);
+	hw_intf_uart_debug_send(log_buf, 22);
+#endif
+
 	return ERR_CODE_SUCCESS;
 }
 
