@@ -29,12 +29,12 @@ extern "C" {
 
 #define USE_SERIAL_DEBUG
 
-#define USE_NRF24L01
+// #define USE_NRF24L01
 // #define USE_SX1278
 
-#define USE_MPU6050
+// #define USE_MPU6050
 // #define USE_HMC5883L
-// #define USE_QMC5883L
+#define USE_QMC5883L
 
 #define USE_ESC_DSHOT
 
