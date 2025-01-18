@@ -34,3 +34,6 @@
 [submodule "Sensor/qmc5883l"]
 	path = Sensor/qmc5883l
 	url = git@github.com:phonght32/qmc5883l.git
+[submodule "Sensor/icm42688"]
+	path = Sensor/icm42688
+	url = git@github.com:phonght32/icm42688.git
