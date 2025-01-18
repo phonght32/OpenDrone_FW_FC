@@ -164,9 +164,6 @@ err_code_t PeriphIMU_UpdateMag(void)
 #ifdef USE_QMC5883L
 	HAL_Delay(100);
 	qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
-
- 	sprintf((char *)log_buf, "%i\t%i\t%i \r\n", mag_x, max_y, mag_z);
-	hw_intf_uart_debug_send(log_buf, 22);
 #endif
 
 	return ERR_CODE_SUCCESS;
