@@ -2,6 +2,7 @@
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
 #include "mpu6050.h"
+#include "icm42688.h"
 #include "hmc5883l.h"
 #include "qmc5883l.h"
 #include "imu_madgwick.h"
@@ -24,6 +25,10 @@ imu_data_t imu_data = {0};
 
 #ifdef USE_MPU6050
 mpu6050_handle_t mpu6050_handle;
+#endif
+
+#ifdef USE_ICM42688
+icm42688_handle_t icm42688_handle;
 #endif
 
 #ifdef USE_HMC5883L
@@ -61,6 +66,19 @@ err_code_t PeriphIMU_Init(void)
 	mpu6050_set_config(mpu6050_handle, mpu6050_cfg);
 	mpu6050_config(mpu6050_handle);
 	mpu6050_auto_calib(mpu6050_handle);
+#endif
+
+#ifdef USE_ICM42688
+	icm42688_handle = icm42688_init();
+	icm42688_cfg_t icm42688_cfg = {
+		.comm_mode 		= ICM42688_COMM_MODE_SPI,
+		.spi_send 		= hw_intf_icm42688_spi_send,
+		.spi_recv 		= hw_intf_icm42688_spi_recv,
+		.set_cs  		= hw_intf_icm42688_set_cs,
+		.delay 			= HAL_Delay
+	};
+	icm42688_set_config(icm42688_handle, icm42688_cfg);
+	icm42688_config(icm42688_handle);
 #endif
 
 #ifdef USE_HMC5883L
