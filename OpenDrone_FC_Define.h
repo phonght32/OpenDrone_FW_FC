@@ -33,6 +33,7 @@ extern "C" {
 // #define USE_SX1278
 
 // #define USE_MPU6050
+#define USE_ICM42688
 // #define USE_HMC5883L
 #define USE_QMC5883L
 
