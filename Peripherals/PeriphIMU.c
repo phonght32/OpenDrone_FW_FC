@@ -1,3 +1,5 @@
+#include "string.h"
+
 #include "Periph.h"
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
@@ -165,6 +167,10 @@ err_code_t PeriphIMU_UpdateAccel(void)
 	imu_data.accel_y = accel_y;
 	imu_data.accel_z = accel_z;
 
+#ifdef USE_SERIAL_DEBUG
+
+#endif
+
 	return ERR_CODE_SUCCESS;
 }
 
@@ -227,6 +233,24 @@ err_code_t PeriphIMU_UpdateFilter(void)
 		return err_ret;
 	}
 #endif
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z)
+{
+	*accel_x = imu_data.accel_x;
+	*accel_y = imu_data.accel_y;
+	*accel_z = imu_data.accel_z;
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
+{
+	*gyro_x = imu_data.gyro_x;
+	*gyro_y = imu_data.gyro_y;
+	*gyro_z = imu_data.gyro_z;
 
 	return ERR_CODE_SUCCESS;
 }
