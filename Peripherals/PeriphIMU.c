@@ -198,8 +198,10 @@ err_code_t PeriphIMU_UpdateGyro(void)
 
 err_code_t PeriphIMU_UpdateMag(void)
 {
+#ifdef USE_QMC5883L
 	err_code_t err_ret;
 	int16_t mag_x = 0, max_y = 0, mag_z = 0;
+#endif
 
 #ifdef USE_QMC5883L
 	err_ret = qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
