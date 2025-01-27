@@ -71,7 +71,13 @@ err_code_t PeriphIMU_Init(void)
 #ifdef USE_ICM42688
 	icm42688_handle = icm42688_init();
 	icm42688_cfg_t icm42688_cfg = {
-		.comm_mode 		= ICM42688_COMM_MODE_SPI,
+		.gyro_mode  	= CONFIG_ICM42688_GYRO_MODE,
+		.gyro_fs_sel 	= CONFIG_ICM42688_GYRO_FS_SEL,
+		.gyro_odr 		= CONFIG_ICM42688_GYRO_ODR,
+		.accel_mode  	= CONFIG_ICM42688_ACCEL_MODE,
+		.accel_fs_sel 	= CONFIG_ICM42688_ACCEL_FS_SEL,
+		.accel_odr 		= CONFIG_ICM42688_ACCEL_ODR,
+		.comm_mode 		= CONFIG_ICM42688_COMM_MODE,
 		.spi_send 		= hw_intf_icm42688_spi_send,
 		.spi_recv 		= hw_intf_icm42688_spi_recv,
 		.set_cs  		= hw_intf_icm42688_set_cs,
@@ -79,6 +85,7 @@ err_code_t PeriphIMU_Init(void)
 	};
 	icm42688_set_config(icm42688_handle, icm42688_cfg);
 	icm42688_config(icm42688_handle);
+	icm42688_auto_calib(icm42688_handle);
 #endif
 
 #ifdef USE_HMC5883L
@@ -146,6 +153,14 @@ err_code_t PeriphIMU_UpdateAccel(void)
 	}
 #endif
 
+#ifdef USE_ICM42688
+	err_ret = icm42688_get_accel_scale(icm42688_handle, &accel_x, &accel_y, &accel_z);
+	if (err_ret != ERR_CODE_SUCCESS)
+	{
+		return err_ret;
+	}
+#endif
+
 	imu_data.accel_x = accel_x;
 	imu_data.accel_y = accel_y;
 	imu_data.accel_z = accel_z;
@@ -166,6 +181,14 @@ err_code_t PeriphIMU_UpdateGyro(void)
 	}
 #endif
 
+#ifdef USE_ICM42688
+	err_ret = icm42688_get_gyro_scale(icm42688_handle, &gyro_x, &gyro_y, &gyro_z);
+	if (err_ret != ERR_CODE_SUCCESS)
+	{
+		return err_ret;
+	}
+#endif
+
 	imu_data.gyro_x = gyro_x;
 	imu_data.gyro_y = gyro_y;
 	imu_data.gyro_z = gyro_z;
@@ -177,11 +200,13 @@ err_code_t PeriphIMU_UpdateMag(void)
 {
 	err_code_t err_ret;
 	int16_t mag_x = 0, max_y = 0, mag_z = 0;
-	uint8_t log_buf[50] = {0};
 
 #ifdef USE_QMC5883L
-	HAL_Delay(100);
-	qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
+	err_ret = qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
+	if (err_ret != ERR_CODE_SUCCESS)
+	{
+		return err_ret;
+	}
 #endif
 
 	return ERR_CODE_SUCCESS;
