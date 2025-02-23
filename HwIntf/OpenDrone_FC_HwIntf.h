@@ -75,11 +75,6 @@ err_code_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t le
 #endif
 
 #ifdef USE_ESC_DSHOT
-err_code_t hw_intf_fl_esc_dshot_set_auto_reload(uint32_t auto_reload);
-err_code_t hw_intf_fr_esc_dshot_set_auto_reload(uint32_t auto_reload);
-err_code_t hw_intf_bl_esc_dshot_set_auto_reload(uint32_t auto_reload);
-err_code_t hw_intf_br_esc_dshot_set_auto_reload(uint32_t auto_reload);
-
 err_code_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma);
 err_code_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma);
 err_code_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma);
