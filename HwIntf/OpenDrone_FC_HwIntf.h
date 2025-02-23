@@ -79,8 +79,6 @@ err_code_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma);
 err_code_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma);
 err_code_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma);
 err_code_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma);
-
-err_code_t hw_intf_esc_dshot_start(void);
 #endif
 
 #ifdef __cplusplus
