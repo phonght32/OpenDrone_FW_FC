@@ -90,6 +90,10 @@ err_code_t OpenDrone_FC_Main(void)
 		PeriphIMU_UpdateMag();
 		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
+		uint16_t throttle = 500;
+		PeriphEsc_PreparePacket(throttle, throttle, throttle, throttle);
+		PeriphEsc_Send();
+
 #ifdef USE_SERIAL_DEBUG
 		task_freq[IDX_TASK_50_HZ] = TIME_US_TO_FREQ_HZ(current_time - last_time_us[IDX_TASK_50_HZ]);
 #endif
@@ -129,7 +133,7 @@ err_code_t OpenDrone_FC_Main(void)
 		        OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.roll,
 		        OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.pitch,
 		        OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.yaw);
-		hw_intf_uart_debug_send(log_buf, strlen(log_buf));
+		hw_intf_uart_debug_send(log_buf, (uint16_t)strlen((char*)log_buf));
 
 		task_freq[IDX_TASK_5_HZ] = TIME_US_TO_FREQ_HZ(current_time - last_time_us[IDX_TASK_5_HZ]);
 #endif
