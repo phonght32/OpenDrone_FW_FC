@@ -25,7 +25,7 @@
 uint8_t log_buf[128];
 uint16_t task_freq[NUM_OF_TASK];
 float debug_roll, debug_pitch, debug_yaw;
-float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x, debug_gyro_y, debug_gyro_z;
+float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x, debug_gyro_y, debug_gyro_z, debug_mag_x, debug_mag_y, debug_mag_z;
 #endif
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
@@ -87,12 +87,12 @@ err_code_t OpenDrone_FC_Main(void)
 	/* Task 50 Hz */
 	if ((current_time - last_time_us[IDX_TASK_50_HZ]) >= FREQ_50_HZ_TIME_US)
 	{
-		// PeriphIMU_UpdateMag();
-		// PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
+		PeriphIMU_UpdateMag();
+		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
-		// uint16_t throttle = 500;
-		// PeriphEsc_PreparePacket(throttle, throttle, throttle, throttle);
-		// PeriphEsc_Send();
+		uint16_t throttle = 500;
+		PeriphEsc_PreparePacket(throttle, throttle, throttle, throttle);
+		PeriphEsc_Send();
 
 #ifdef USE_SERIAL_DEBUG
 		task_freq[IDX_TASK_50_HZ] = TIME_US_TO_FREQ_HZ(current_time - last_time_us[IDX_TASK_50_HZ]);
@@ -106,29 +106,34 @@ err_code_t OpenDrone_FC_Main(void)
 	{
 #ifdef USE_SERIAL_DEBUG
 
+		/* Send debug 9-DoF */
 		// PeriphIMU_GetAccel(&debug_accel_x, &debug_accel_y, &debug_accel_z);
 		// PeriphIMU_GetGyro(&debug_gyro_x, &debug_gyro_y, &debug_gyro_z);
+		// PeriphIMU_GetMag(&debug_mag_x, &debug_mag_y, &debug_mag_z);
 
-		// sprintf((char *)log_buf, "\r\nAccel_x: %7.4f\tAccel_y: %7.4f\tAccel_z: %7.4f\tGyro_x: %7.4f\tGyro_y: %7.4f\tGyro_z: %7.4f\t",
+		// sprintf((char *)log_buf, "\n%f,%f,%f,%f,%f,%f,%f,%f,%f",
 		//         debug_accel_x, debug_accel_y, debug_accel_z,
-		//         debug_gyro_x, debug_gyro_y, debug_gyro_z);
+		//         debug_gyro_x, debug_gyro_y, debug_gyro_z,
+		//         debug_mag_x, debug_mag_y, debug_mag_z);
 		// hw_intf_uart_debug_send(log_buf, strlen(log_buf));
 
 
+		/* Send debug angle */
 		PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
-		sprintf((char *)log_buf, "\r\n%7.4f,%7.4f,%7.4f", debug_roll, debug_pitch, debug_yaw);
+		sprintf((char *)log_buf, "\n%f,%f,%f", debug_roll, debug_pitch, debug_yaw);
 		hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
-		// sprintf((char *)log_buf, "\r\nTask 200 Hz actual frequency: %d Hz", task_freq[IDX_TASK_250_HZ]);
+		/* Send debug frequency */
+		// sprintf((char *)log_buf, "\nTask 200 Hz actual frequency: %d Hz", task_freq[IDX_TASK_250_HZ]);
+		// hw_intf_uart_debug_send(log_buf, 45);
+		// sprintf((char *)log_buf, "\nTask 50 Hz actual frequency: %d Hz", task_freq[IDX_TASK_50_HZ]);
+		// hw_intf_uart_debug_send(log_buf, 45);
+		// sprintf((char *)log_buf, "\nTask 5 Hz actual frequency: %d Hz", task_freq[IDX_TASK_5_HZ]);
 		// hw_intf_uart_debug_send(log_buf, 45);
 
-		// sprintf((char *)log_buf, "\r\nTask 50 Hz actual frequency: %d Hz", task_freq[IDX_TASK_50_HZ]);
-		// hw_intf_uart_debug_send(log_buf, 45);
 
-		// sprintf((char *)log_buf, "\r\nTask 5 Hz actual frequency: %d Hz", task_freq[IDX_TASK_5_HZ]);
-		// hw_intf_uart_debug_send(log_buf, 45);
-
-		// sprintf((char *)log_buf, "\r\nthrottle: %03d \troll: %03d \tpitch: %03d \tyaw: %03d",
+		/* Send debug command */
+		// sprintf((char *)log_buf, "\nthrottle: %03d \troll: %03d \tpitch: %03d \tyaw: %03d",
 		//         OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle,
 		//         OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.roll,
 		//         OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.pitch,
