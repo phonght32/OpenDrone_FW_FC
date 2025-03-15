@@ -41,7 +41,8 @@ extern "C" {
 
 #define USE_ESC_DSHOT
 
-#define USE_IMU_MADGWICK_6DOF
+// #define USE_IMU_MADGWICK_6DOF
+#define USE_IMU_MADGWICK_9DOF
 
 #define USE_PID_CONTROLLER
 
@@ -95,7 +96,7 @@ extern "C" {
 #define DSHOT_DMA_BUFFER                	18
 #define CONFIG_ESC_DSHOT_TYPE           	ESC_DSHOT_TYPE_600
 
-#define CONFIG_IMU_MADGWICK_BETA  			0.1f
+#define CONFIG_IMU_MADGWICK_BETA  			0.8f
 #define CONFIG_IMU_MADGWICK_SAMPLE_FREQ  	250
 
 #define CONFIG_PID_CONTROLLER_KP  			0
