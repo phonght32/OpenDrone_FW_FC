@@ -45,6 +45,10 @@ qmc5883l_handle_t qmc5883l_handle;
 imu_madgwick_handle_t imu_madgwick_handle = NULL;
 #endif
 
+#ifdef USE_IMU_MADGWICK_9DOF
+imu_madgwick_handle_t imu_madgwick_handle = NULL;
+#endif
+
 err_code_t PeriphIMU_Init(void)
 {
 #ifdef USE_MPU6050
@@ -117,19 +121,26 @@ err_code_t PeriphIMU_Init(void)
 		.data_rate 		= CONFIG_QMC5883L_DATA_RATE,
 		.sample_rate 	= CONFIG_QMC5883L_SAMPLES,
 		.intr_en 		= CONFIG_QMC5883L_INTR_ENABLE,
-		.mag_bias_x 	= 0,
-		.mag_bias_y 	= 0,
-		.mag_bias_z 	= 0,
+		.hard_bias_x     = 154.7851961238576,
+		.hard_bias_y     = -12.923460697083387,
+		.hard_bias_z     = -16.002331463439372,
+		.soft_bias_c11   = 0.6232115045089357,
+		.soft_bias_c12   = 0.004997471269166363,
+		.soft_bias_c13   = 0.022147854060797133,
+		.soft_bias_c21   = 0.004997471269166429,
+		.soft_bias_c22   = 0.6324010352739647,
+		.soft_bias_c23   = -0.00080240879779977,
+		.soft_bias_c31   = 0.02214785406079713,
+		.soft_bias_c32   = -0.000802408797799873,
+		.soft_bias_c33   = 0.7179876576597246,
 		.i2c_send 		= hw_intf_qmc5883l_i2c_send,
 		.i2c_recv 		= hw_intf_qmc5883l_i2c_recv,
 		.delay 			= HAL_Delay
 	};
 	qmc5883l_set_config(qmc5883l_handle, qmc5883l_cfg);
 	qmc5883l_config(qmc5883l_handle);
-//	qmc5883l_auto_calib(qmc5883l_handle);
 #endif
 
-#ifdef USE_IMU_MADGWICK_6DOF
 	imu_madgwick_handle = imu_madgwick_init();
 	imu_madgwick_cfg_t imu_madgwick_cfg = {
 		.beta 		 = CONFIG_IMU_MADGWICK_BETA,
@@ -137,7 +148,6 @@ err_code_t PeriphIMU_Init(void)
 	};
 	imu_madgwick_set_config(imu_madgwick_handle, imu_madgwick_cfg);
 	imu_madgwick_config(imu_madgwick_handle);
-#endif
 
 	return ERR_CODE_SUCCESS;
 }
@@ -206,16 +216,20 @@ err_code_t PeriphIMU_UpdateMag(void)
 {
 #ifdef USE_QMC5883L
 	err_code_t err_ret;
-	int16_t mag_x = 0, max_y = 0, mag_z = 0;
+	float mag_x = 0, mag_y = 0, mag_z = 0;
 #endif
 
 #ifdef USE_QMC5883L
-	err_ret = qmc5883l_get_mag_raw(qmc5883l_handle, &mag_x, &max_y, &mag_z);
+	err_ret = qmc5883l_get_mag_calib(qmc5883l_handle, &mag_x, &mag_y, &mag_z);
 	if (err_ret != ERR_CODE_SUCCESS)
 	{
 		return err_ret;
 	}
 #endif
+
+	imu_data.mag_x = mag_x;
+	imu_data.mag_y = mag_y;
+	imu_data.mag_z = mag_z;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -228,6 +242,17 @@ err_code_t PeriphIMU_UpdateFilter(void)
 	err_ret = imu_madgwick_update_6dof(imu_madgwick_handle,
 	                                   imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
 	                                   imu_data.accel_x, imu_data.accel_y, imu_data.accel_z);
+	if (err_ret != ERR_CODE_SUCCESS)
+	{
+		return err_ret;
+	}
+#endif
+
+#ifdef USE_IMU_MADGWICK_9DOF
+	err_ret = imu_madgwick_update_9dof(imu_madgwick_handle,
+	                                   imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
+	                                   imu_data.accel_x, imu_data.accel_y, imu_data.accel_z,
+	                                   imu_data.mag_x, imu_data.mag_y, imu_data.mag_z);
 	if (err_ret != ERR_CODE_SUCCESS)
 	{
 		return err_ret;
@@ -255,9 +280,17 @@ err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
 	return ERR_CODE_SUCCESS;
 }
 
+err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
+{
+	*mag_x = imu_data.mag_x;
+	*mag_y = imu_data.mag_y;
+	*mag_z = imu_data.mag_z;
+
+	return ERR_CODE_SUCCESS;
+}
+
 err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 {
-#ifdef USE_IMU_MADGWICK_6DOF
 	err_code_t err_ret;
 	float q0, q1, q2, q3;
 
@@ -270,7 +303,6 @@ err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 	*roll = 180.0 / 3.14 * atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
 	*pitch = 180.0 / 3.14 * asin(2 * (q0 * q2 - q3 * q1));
 	*yaw = 180.0 / 3.14 * atan2f(q0 * q3 + q1 * q2, 0.5f - q2 * q2 - q3 * q3);
-#endif
 
 	return ERR_CODE_SUCCESS;
 }
