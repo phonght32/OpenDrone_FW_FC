@@ -34,28 +34,9 @@ OpenDrone_TxProtocol_Msg_t OpenDrone_TxProtocol_Msg = {0};
 err_code_t OpenDrone_FC_Init(void)
 {
 	PeriphIMU_Init();
-#ifdef USE_SERIAL_DEBUG
-	sprintf((char *)log_buf, "\r\nInit peripheral IMU complete");
-	hw_intf_uart_debug_send(log_buf, 30);
-#endif
-
 	PeriphRadio_Init();
-#ifdef USE_SERIAL_DEBUG
-	sprintf((char *)log_buf, "\r\nInit peripheral RADIO complete");
-	hw_intf_uart_debug_send(log_buf, 32);
-#endif
-
 	PeriphEsc_Init();
-#ifdef USE_SERIAL_DEBUG
-	sprintf((char *)log_buf, "\r\nInit peripheral ESC complete");
-	hw_intf_uart_debug_send(log_buf, 30);
-#endif
-
 	PeriphController_Init();
-#ifdef USE_SERIAL_DEBUG
-	sprintf((char *)log_buf, "\r\nInit peripheral CONTROLLER complete");
-	hw_intf_uart_debug_send(log_buf, 37);
-#endif
 
 	return ERR_CODE_SUCCESS;
 }
