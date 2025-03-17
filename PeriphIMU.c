@@ -83,6 +83,12 @@ err_code_t PeriphIMU_Init(void)
 		.accel_mode  	= CONFIG_ICM42688_ACCEL_MODE,
 		.accel_fs_sel 	= CONFIG_ICM42688_ACCEL_FS_SEL,
 		.accel_odr 		= CONFIG_ICM42688_ACCEL_ODR,
+		.accel_bias_x 	= 19,
+		.accel_bias_y 	= 21,
+		.accel_bias_z 	= 26,
+		.gyro_bias_x 	= 12,
+		.gyro_bias_y 	= 0,
+		.gyro_bias_z 	= 17,
 		.comm_mode 		= CONFIG_ICM42688_COMM_MODE,
 		.spi_send 		= hw_intf_icm42688_spi_send,
 		.spi_recv 		= hw_intf_icm42688_spi_recv,
@@ -91,7 +97,6 @@ err_code_t PeriphIMU_Init(void)
 	};
 	icm42688_set_config(icm42688_handle, icm42688_cfg);
 	icm42688_config(icm42688_handle);
-	icm42688_auto_calib(icm42688_handle);
 #endif
 
 #ifdef USE_HMC5883L
