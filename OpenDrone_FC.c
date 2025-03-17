@@ -98,17 +98,17 @@ err_code_t OpenDrone_FC_Main(void)
 
 
 		/* Send debug angle */
-		// PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
-		// sprintf((char *)log_buf, "\n%f,%f,%f", debug_roll, debug_pitch, debug_yaw);
-		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+		PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
+		sprintf((char *)log_buf, "%f,%f,%f\n", debug_roll, debug_pitch, debug_yaw);
+		hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 		/* Send debug frequency */
-		sprintf((char *)log_buf, "Task cyclic: %d us, %d us, %d us, %d us\n",
-		        cyclic_task_ms[IDX_TASK_1MS],
-		        cyclic_task_ms[IDX_TASK_10MS],
-		        cyclic_task_ms[IDX_TASK_20MS],
-		        cyclic_task_ms[IDX_TASK_200MS]);
-		hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+		// sprintf((char *)log_buf, "Task cyclic: %d us, %d us, %d us, %d us\n",
+		//         cyclic_task_ms[IDX_TASK_1MS],
+		//         cyclic_task_ms[IDX_TASK_10MS],
+		//         cyclic_task_ms[IDX_TASK_20MS],
+		//         cyclic_task_ms[IDX_TASK_200MS]);
+		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 
 		/* Send debug command */
