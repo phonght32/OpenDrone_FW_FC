@@ -71,7 +71,7 @@ err_code_t OpenDrone_FC_Main(void)
 		PeriphIMU_UpdateMag();
 		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
-		uint16_t throttle = OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
+		uint16_t throttle = 48 + OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
 		PeriphEsc_PreparePacket(throttle, throttle, throttle, throttle);
 		PeriphEsc_Send();
 
