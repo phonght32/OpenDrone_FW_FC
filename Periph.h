@@ -33,6 +33,7 @@ err_code_t PeriphIMU_Init(void);
 err_code_t PeriphIMU_UpdateAccel(void);
 err_code_t PeriphIMU_UpdateGyro(void);
 err_code_t PeriphIMU_UpdateMag(void);
+err_code_t PeriphIMU_UpdateBaro(void);
 err_code_t PeriphIMU_UpdateFilter(void);
 err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z);
 err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z);

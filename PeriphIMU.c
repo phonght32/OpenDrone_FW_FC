@@ -262,6 +262,26 @@ err_code_t PeriphIMU_UpdateMag(void)
 	return ERR_CODE_SUCCESS;
 }
 
+#ifdef USE_BMP280
+err_code_t PeriphIMU_UpdateBaro(void)
+{
+	err_code_t err_ret;
+	float pressure = 0;
+
+#ifdef USE_BMP280
+	err_ret = bmp280_get_pressure(bmp280_handle, &pressure);
+	if (err_ret != ERR_CODE_SUCCESS)
+	{
+		return err_ret;
+	}
+#endif
+
+	imu_data.pressure = pressure;
+
+	return ERR_CODE_SUCCESS;
+}
+#endif
+
 err_code_t PeriphIMU_UpdateFilter(void)
 {
 	err_code_t err_ret;
