@@ -37,3 +37,9 @@
 [submodule "Sensor/icm42688"]
 	path = Sensor/icm42688
 	url = git@github.com:phonght32/icm42688.git
+[submodule "Filter/kalman_height_estimation"]
+	path = Filter/kalman_height_estimation
+	url = git@github.com:phonght32/kalman_height_estimation.git
+[submodule "Algorithm/CLinearAlgebra"]
+	path = Algorithm/CLinearAlgebra
+	url = git@github.com:phonght32/CLinearAlgebra.git
