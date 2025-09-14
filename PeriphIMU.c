@@ -7,9 +7,8 @@
 #include "icm42688.h"
 #include "hmc5883l.h"
 #include "qmc5883l.h"
+#include "bmp280.h"
 #include "imu_madgwick.h"
-
-#define MAX_IMU_SAMPLES  	10
 
 typedef struct {
 	float accel_x;
@@ -21,6 +20,7 @@ typedef struct {
 	float mag_x;
 	float mag_y;
 	float mag_z;
+	float pressure;
 } imu_data_t;
 
 imu_data_t imu_data = {0};
@@ -40,6 +40,11 @@ hmc5883l_handle_t hmc5883l_handle;
 #ifdef USE_QMC5883L
 qmc5883l_handle_t qmc5883l_handle;
 #endif
+
+#ifdef USE_BMP280
+bmp280_handle_t bmp280_handle;
+#endif
+
 
 #ifdef USE_IMU_MADGWICK_6DOF
 imu_madgwick_handle_t imu_madgwick_handle = NULL;
@@ -146,6 +151,24 @@ err_code_t PeriphIMU_Init(void)
 	qmc5883l_config(qmc5883l_handle);
 #endif
 
+#ifdef USE_BMP280
+	bmp280_cfg_t bmp280_cfg = {
+        .opr_mode                   = CONFIG_BMP280_OPR_MODE,
+        .filter                     = CONFIG_BMP280_FILTER,
+        .over_sampling_pressure     = CONFIG_BMP280_OVER_SAMPLING_PRES,
+        .over_sampling_temperature  = CONFIG_BMP280_OVER_SAMPLING_TEMP,
+        .over_sampling_humidity     = CONFIG_BMP280_OVER_SAMPLING_HUMD,
+        .standby_time               = CONFIG_BMP280_STANDBY_TIME,
+        .comm_mode                  = CONFIG_BMP280_COMM_MODE,
+        .i2c_send                   = hw_intf_bmp280_i2c_send,
+        .i2c_recv                   = hw_intf_bmp280_i2c_recv,
+        .delay                      = HAL_Delay,
+    };
+    bmp280_handle = bmp280_init();
+    bmp280_set_config(bmp280_handle, bmp280_cfg);
+    bmp280_config(bmp280_handle);
+#endif
+
 	imu_madgwick_handle = imu_madgwick_init();
 	imu_madgwick_cfg_t imu_madgwick_cfg = {
 		.beta 		 = CONFIG_IMU_MADGWICK_BETA,
@@ -153,7 +176,7 @@ err_code_t PeriphIMU_Init(void)
 	};
 	imu_madgwick_set_config(imu_madgwick_handle, imu_madgwick_cfg);
 	imu_madgwick_config(imu_madgwick_handle);
-
+	
 	return ERR_CODE_SUCCESS;
 }
 
