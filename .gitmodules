@@ -40,3 +40,6 @@
 [submodule "Filter/kalman_height_estimation"]
 	path = Filter/kalman_height_estimation
 	url = git@github.com:phonght32/kalman_height_estimation.git
+[submodule "Algorithm/clinalg"]
+	path = Algorithm/clinalg
+	url = git@github.com:phonght32/clinalg.git
