@@ -26,6 +26,7 @@ uint8_t log_buf[128];
 uint32_t cyclic_task_ms[NUM_OF_TASK];
 float debug_roll, debug_pitch, debug_yaw;
 float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x, debug_gyro_y, debug_gyro_z, debug_mag_x, debug_mag_y, debug_mag_z;
+float debug_altitude, debug_baro;
 #endif
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
@@ -61,7 +62,7 @@ err_code_t OpenDrone_FC_Main(void)
 	if ((current_time - last_time_us[IDX_TASK_10MS]) >= DURATION_10MS)
 	{
 		cyclic_task_ms[IDX_TASK_10MS] = current_time - last_time_us[IDX_TASK_10MS];
-		
+
 		last_time_us[IDX_TASK_10MS] = current_time;
 	}
 
@@ -69,6 +70,9 @@ err_code_t OpenDrone_FC_Main(void)
 	if ((current_time - last_time_us[IDX_TASK_20MS]) >= DURATION_20MS)
 	{
 		PeriphIMU_UpdateMag();
+		PeriphIMU_UpdateBaro();
+		PeriphIMU_UpdateFilterHeight();
+
 		PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
 
 		uint16_t throttle = 48 + OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
@@ -96,10 +100,15 @@ err_code_t OpenDrone_FC_Main(void)
 		//         debug_mag_x, debug_mag_y, debug_mag_z);
 		// hw_intf_uart_debug_send(log_buf, strlen(log_buf));
 
-
 		/* Send debug angle */
-		PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
-		sprintf((char *)log_buf, "%f,%f,%f\n", debug_roll, debug_pitch, debug_yaw);
+		// PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
+		// sprintf((char *)log_buf, "%f,%f,%f\n", debug_roll, debug_pitch, debug_yaw);
+		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+
+		/* Send debug altitude */
+		PeriphIMU_GetBaro(&debug_baro);
+		PeriphIMU_GetAltitude(&debug_altitude);
+		sprintf((char *)log_buf, "%f,%f\n", debug_baro, debug_altitude * 100);
 		hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 		/* Send debug frequency */
@@ -109,7 +118,6 @@ err_code_t OpenDrone_FC_Main(void)
 		//         cyclic_task_ms[IDX_TASK_20MS],
 		//         cyclic_task_ms[IDX_TASK_200MS]);
 		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
-
 
 		/* Send debug command */
 		// sprintf((char *)log_buf, "\nthrottle: %03d \troll: %03d \tpitch: %03d \tyaw: %03d",

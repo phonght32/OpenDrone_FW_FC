@@ -9,6 +9,7 @@
 #include "qmc5883l.h"
 #include "bmp280.h"
 #include "imu_madgwick.h"
+#include "kalman_height_estimation.h"
 
 typedef struct {
 	float accel_x;
@@ -52,6 +53,10 @@ imu_madgwick_handle_t imu_madgwick_handle = NULL;
 
 #ifdef USE_IMU_MADGWICK_9DOF
 imu_madgwick_handle_t imu_madgwick_handle = NULL;
+#endif
+
+#ifdef USE_KALMAN_HEIGHT_ESTIMATION
+kalman_height_estimation_handle_t kalman_height_estimation_handle = NULL;
 #endif
 
 err_code_t PeriphIMU_Init(void)
@@ -153,20 +158,20 @@ err_code_t PeriphIMU_Init(void)
 
 #ifdef USE_BMP280
 	bmp280_cfg_t bmp280_cfg = {
-        .opr_mode                   = CONFIG_BMP280_OPR_MODE,
-        .filter                     = CONFIG_BMP280_FILTER,
-        .over_sampling_pressure     = CONFIG_BMP280_OVER_SAMPLING_PRES,
-        .over_sampling_temperature  = CONFIG_BMP280_OVER_SAMPLING_TEMP,
-        .over_sampling_humidity     = CONFIG_BMP280_OVER_SAMPLING_HUMD,
-        .standby_time               = CONFIG_BMP280_STANDBY_TIME,
-        .comm_mode                  = CONFIG_BMP280_COMM_MODE,
-        .i2c_send                   = hw_intf_bmp280_i2c_send,
-        .i2c_recv                   = hw_intf_bmp280_i2c_recv,
-        .delay                      = HAL_Delay,
-    };
-    bmp280_handle = bmp280_init();
-    bmp280_set_config(bmp280_handle, bmp280_cfg);
-    bmp280_config(bmp280_handle);
+		.opr_mode                   = CONFIG_BMP280_OPR_MODE,
+		.filter                     = CONFIG_BMP280_FILTER,
+		.over_sampling_pressure     = CONFIG_BMP280_OVER_SAMPLING_PRES,
+		.over_sampling_temperature  = CONFIG_BMP280_OVER_SAMPLING_TEMP,
+		.over_sampling_humidity     = CONFIG_BMP280_OVER_SAMPLING_HUMD,
+		.standby_time               = CONFIG_BMP280_STANDBY_TIME,
+		.comm_mode                  = CONFIG_BMP280_COMM_MODE,
+		.i2c_send                   = hw_intf_bmp280_i2c_send,
+		.i2c_recv                   = hw_intf_bmp280_i2c_recv,
+		.delay                      = HAL_Delay,
+	};
+	bmp280_handle = bmp280_init();
+	bmp280_set_config(bmp280_handle, bmp280_cfg);
+	bmp280_config(bmp280_handle);
 #endif
 
 	imu_madgwick_handle = imu_madgwick_init();
@@ -176,7 +181,17 @@ err_code_t PeriphIMU_Init(void)
 	};
 	imu_madgwick_set_config(imu_madgwick_handle, imu_madgwick_cfg);
 	imu_madgwick_config(imu_madgwick_handle);
-	
+
+#ifdef USE_KALMAN_HEIGHT_ESTIMATION
+	kalman_height_estimation_handle = kalman_height_estimation_init();
+	kalman_height_estimation_cfg_t kalman_height_estimation_cfg = {
+		.dt = 0.02f,
+	};
+	kalman_height_estimation_set_config(kalman_height_estimation_handle, kalman_height_estimation_cfg);
+	kalman_height_estimation_config(kalman_height_estimation_handle);
+#endif
+
+
 	return ERR_CODE_SUCCESS;
 }
 
@@ -284,27 +299,29 @@ err_code_t PeriphIMU_UpdateBaro(void)
 
 err_code_t PeriphIMU_UpdateFilter(void)
 {
-	err_code_t err_ret;
-
 #ifdef USE_IMU_MADGWICK_6DOF
-	err_ret = imu_madgwick_update_6dof(imu_madgwick_handle,
-	                                   imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
-	                                   imu_data.accel_x, imu_data.accel_y, imu_data.accel_z);
-	if (err_ret != ERR_CODE_SUCCESS)
-	{
-		return err_ret;
-	}
+	imu_madgwick_update_6dof(imu_madgwick_handle,
+	                         imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
+	                         imu_data.accel_x, imu_data.accel_y, imu_data.accel_z);
 #endif
 
 #ifdef USE_IMU_MADGWICK_9DOF
-	err_ret = imu_madgwick_update_9dof(imu_madgwick_handle,
-	                                   imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
-	                                   imu_data.accel_x, imu_data.accel_y, imu_data.accel_z,
-	                                   imu_data.mag_x, imu_data.mag_y, imu_data.mag_z);
-	if (err_ret != ERR_CODE_SUCCESS)
-	{
-		return err_ret;
-	}
+	imu_madgwick_update_9dof(imu_madgwick_handle,
+	                         imu_data.gyro_x, imu_data.gyro_y, imu_data.gyro_z,
+	                         imu_data.accel_x, imu_data.accel_y, imu_data.accel_z,
+	                         imu_data.mag_x, imu_data.mag_y, imu_data.mag_z);
+#endif
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t PeriphIMU_UpdateFilterHeight(void)
+{
+#ifdef USE_KALMAN_HEIGHT_ESTIMATION
+	float altitude = 0.0;
+	bmp280_convert_pressure_to_altitude(bmp280_handle, imu_data.pressure, &altitude);
+
+	kalman_height_estimation_update(kalman_height_estimation_handle, imu_data.accel_z - 9.81f, altitude);
 #endif
 
 	return ERR_CODE_SUCCESS;
@@ -337,6 +354,13 @@ err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
 	return ERR_CODE_SUCCESS;
 }
 
+err_code_t PeriphIMU_GetBaro(float *baro)
+{
+	*baro = imu_data.pressure;
+
+	return ERR_CODE_SUCCESS;
+}
+
 err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 {
 	err_code_t err_ret;
@@ -351,6 +375,15 @@ err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 	*roll = 180.0 / 3.14 * atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
 	*pitch = 180.0 / 3.14 * asin(2 * (q0 * q2 - q3 * q1));
 	*yaw = 180.0 / 3.14 * atan2f(q0 * q3 + q1 * q2, 0.5f - q2 * q2 - q3 * q3);
+
+	return ERR_CODE_SUCCESS;
+}
+
+err_code_t PeriphIMU_GetAltitude(float *altitude)
+{
+#ifdef USE_KALMAN_HEIGHT_ESTIMATION
+	kalman_height_estimation_get_height(kalman_height_estimation_handle, altitude);
+#endif
 
 	return ERR_CODE_SUCCESS;
 }
