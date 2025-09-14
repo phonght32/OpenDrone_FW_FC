@@ -106,10 +106,10 @@ err_code_t OpenDrone_FC_Main(void)
 		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 		/* Send debug altitude */
-		PeriphIMU_GetBaro(&debug_baro);
-		PeriphIMU_GetAltitude(&debug_altitude);
-		sprintf((char *)log_buf, "%f,%f\n", debug_baro, debug_altitude * 100);
-		hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+		// PeriphIMU_GetBaro(&debug_baro);
+		// PeriphIMU_GetAltitude(&debug_altitude);
+		// sprintf((char *)log_buf, "%f,%f\n", debug_baro, debug_altitude * 100);
+		// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 		/* Send debug frequency */
 		// sprintf((char *)log_buf, "Task cyclic: %d us, %d us, %d us, %d us\n",
