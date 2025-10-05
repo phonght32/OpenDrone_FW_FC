@@ -321,7 +321,7 @@ err_code_t PeriphIMU_UpdateFilterHeight(void)
 	float altitude = 0.0;
 	bmp280_convert_pressure_to_altitude(bmp280_handle, imu_data.pressure, &altitude);
 
-	kalman_height_estimation_update(kalman_height_estimation_handle, imu_data.accel_z - 9.81f, altitude);
+	kalman_height_estimation_update(kalman_height_estimation_handle, imu_data.accel_z*0.99 - 9.99f, altitude);
 #endif
 
 	return ERR_CODE_SUCCESS;
