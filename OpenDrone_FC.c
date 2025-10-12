@@ -209,17 +209,12 @@ err_code_t OpenDrone_Controller_Update(void)
     /* Only send if armed */
     if (is_armed) 
     {
-        PeriphEsc_PreparePacket(dshot_motors[0],
-                                dshot_motors[1],
-                                dshot_motors[2],
-                                dshot_motors[3]);
-        PeriphEsc_Send();
+        PeriphEsc_Send(dshot_motors[0], dshot_motors[1], dshot_motors[2], dshot_motors[3]);
     } 
     else 
     {
         /* Disarmed: send idle (48) to keep ESC alive but motors stopped */
-        PeriphEsc_PreparePacket(48, 48, 48, 48);
-        PeriphEsc_Send();
+        PeriphEsc_Send(48, 48, 48, 48);
     }
 
     return ERR_CODE_SUCCESS;

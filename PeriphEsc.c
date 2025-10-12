@@ -62,21 +62,14 @@ err_code_t PeriphEsc_Init(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphEsc_PreparePacket(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle)
+err_code_t PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle)
 {
 #ifdef USE_ESC_DSHOT
 	esc_dshot_prepare_packet(fl_esc_dshot_handle, fl_throttle, fl_esc_dshot_dmabuffer);
 	esc_dshot_prepare_packet(fr_esc_dshot_handle, fr_throttle, fr_esc_dshot_dmabuffer);
 	esc_dshot_prepare_packet(bl_esc_dshot_handle, bl_throttle, bl_esc_dshot_dmabuffer);
 	esc_dshot_prepare_packet(br_esc_dshot_handle, br_throttle, br_esc_dshot_dmabuffer);
-#endif
 
-	return ERR_CODE_SUCCESS;
-}
-
-err_code_t PeriphEsc_Send(void)
-{
-#ifdef USE_ESC_DSHOT
 	esc_dshot_send_packet(fl_esc_dshot_handle, fl_esc_dshot_dmabuffer);
 	esc_dshot_send_packet(fr_esc_dshot_handle, fr_esc_dshot_dmabuffer);
 	esc_dshot_send_packet(bl_esc_dshot_handle, bl_esc_dshot_dmabuffer);
