@@ -119,6 +119,9 @@ extern "C" {
 #define CONFIG_PID_CONTROLLER_INT_LIM_MAX  	0
 #define CONFIG_PID_CONTROLLER_SAMPLE_TIME 	0
 
+#define CONFIG_CONTROLLER_MODE_ANGLE
+#define CONFIG_CONTROLLER_PID
+
 #ifdef __cplusplus
 }
 #endif
