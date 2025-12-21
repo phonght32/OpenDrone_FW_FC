@@ -164,18 +164,6 @@ err_code_t OpenDrone_Controller_Update(void)
     float desired_yaw_rate  = rc_norm_yaw   * RC_YAW_SCALE_DPS;
     float throttle_out      = rc_norm_thr   * MOTOR_MAX;
 
-    // Failsafe: if radio timed out -> zero sticks, cut throttle
-    uint32_t now = hw_intf_get_time_us();
-    if ((now - last_rx_time_us) > RADIO_TIMEOUT_US) 
-    {
-        throttle_out = 0.0f;
-
-        /* optionally zero desired angles/rates */ 
-        desired_roll_deg = 0.0f;
-        desired_pitch_deg = 0.0f;
-        desired_yaw_rate = 0.0f;
-    }
-
     /* Read angle in deg */
     PeriphIMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
 
