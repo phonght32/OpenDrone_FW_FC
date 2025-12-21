@@ -216,9 +216,13 @@ err_code_t PeriphIMU_UpdateAccel(void)
 	}
 #endif
 
-	imu_data.accel_x = accel_x;
-	imu_data.accel_y = accel_y;
-	imu_data.accel_z = accel_z;
+	// imu_data.accel_x = accel_x;
+	// imu_data.accel_y = accel_y;
+	// imu_data.accel_z = accel_z;
+
+	imu_data.accel_x = accel_y;
+	imu_data.accel_y = accel_x;
+	imu_data.accel_z = -accel_z;
 
 #ifdef USE_SERIAL_DEBUG
 
@@ -248,9 +252,13 @@ err_code_t PeriphIMU_UpdateGyro(void)
 	}
 #endif
 
-	imu_data.gyro_x = gyro_x;
-	imu_data.gyro_y = gyro_y;
-	imu_data.gyro_z = gyro_z;
+	// imu_data.gyro_x = gyro_x;
+	// imu_data.gyro_y = gyro_y;
+	// imu_data.gyro_z = gyro_z;
+
+	imu_data.gyro_x = gyro_y;
+	imu_data.gyro_y = gyro_x;
+	imu_data.gyro_z = -gyro_z;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -268,9 +276,13 @@ err_code_t PeriphIMU_UpdateMag(void)
 	}
 #endif
 
-	imu_data.mag_x = mag_x;
-	imu_data.mag_y = mag_y;
-	imu_data.mag_z = mag_z;
+	// imu_data.mag_x = mag_x;
+	// imu_data.mag_y = mag_y;
+	// imu_data.mag_z = mag_z;
+
+	imu_data.mag_x = -mag_y;
+	imu_data.mag_y = mag_x;
+	imu_data.mag_z = -mag_z;
 
 	return ERR_CODE_SUCCESS;
 }
