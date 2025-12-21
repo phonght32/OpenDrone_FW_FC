@@ -29,7 +29,7 @@
 #define RC_ROLL_SCALE_DEG           10.0f   // stick full => +/- 10 degrees
 #define RC_PITCH_SCALE_DEG          10.0f   // stick full => +/- 10 degrees
 #define RC_YAW_SCALE_DPS            10.0f   // stick full => +/- 10 deg/s
-#define RATE_TO_MOTOR_SCALE         0.30f   // tune: 0.2..0.6 typical
+#define RATE_TO_MOTOR_SCALE         0.60f   // tune: 0.2..0.6 typical
 
 // Motor output range (example): 1000..2000 use floats 0..1000, adapt to your ESC interface
 #define MOTOR_MIN                   0.0f
@@ -100,9 +100,9 @@ err_code_t OpenDrone_Controller_Init(void)
 {
     // Outer angle PID config (produces desired rate in deg/s typically)
     pid_controller_cfg_t cfg_angle = {
-        .kp = 4.0f,
+        .kp = 12.0f,
         .ki = 0.02f,
-        .kd = 0.0f,
+        .kd = 5.0f,
         .tau = 0.02f,
         .lim_min = -200.0f,
         .lim_max = 200.0f,
@@ -118,7 +118,7 @@ err_code_t OpenDrone_Controller_Init(void)
 
     // Inner rate PID config (works on angular rates)
     pid_controller_cfg_t cfg_rate = {
-        .kp = 0.08f,
+        .kp = 0.8f,
         .ki = 0.01f,
         .kd = 0.001f,
         .tau = 0.02f,
@@ -198,6 +198,9 @@ err_code_t OpenDrone_Controller_Update(void)
     if (is_armed) 
     {
         PeriphEsc_Send(dshot_motors[0], dshot_motors[1], dshot_motors[2], dshot_motors[3]);
+
+        // sprintf((char *)log_buf, "%d,%d,%d,%d\n", dshot_motors[0], dshot_motors[1], dshot_motors[2], dshot_motors[3]);
+        // hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
     } 
     else 
     {
@@ -227,8 +230,7 @@ err_code_t OpenDrone_FC_Main(void)
 	if ((current_time - last_time_us[IDX_TASK_HIGH]) >= DURATION_TASK_HIGH)
 	{
         // uint16_t throttle = 48 + OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
-		// PeriphEsc_PreparePacket(throttle, throttle, throttle, throttle);
-		// PeriphEsc_Send();
+        // PeriphEsc_Send(48, throttle, 48, 48);
 
 		PeriphIMU_UpdateAccel();
 		PeriphIMU_UpdateGyro();
@@ -295,9 +297,9 @@ static void OpenDrone_FC_PrintInfo(void)
 	// hw_intf_uart_debug_send(log_buf, strlen(log_buf));
 
 	/* Send debug angle */
-	// PeriphIMU_GetAngel(&debug_roll, &debug_pitch, &debug_yaw);
-	// sprintf((char *)log_buf, "%f,%f,%f\n", debug_roll, debug_pitch, debug_yaw);
-	// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+    // PeriphIMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
+    // sprintf((char *)log_buf, "%f,%f,%f\n", roll_angle, pitch_angle, yaw_angle);
+    // hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 	/* Send debug altitude */
     // float debug_altitude, debug_baro;
