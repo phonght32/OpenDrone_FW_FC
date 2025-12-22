@@ -59,7 +59,7 @@ float roll_angle_out, pitch_angle_out;
 float roll_rate_out, pitch_rate_out, yaw_rate_out;
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
-OpenDrone_TxProtocol_Msg_t OpenDrone_TxProtocol_Msg = {0};
+OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 
 
 static void OpenDrone_FC_PrintInfo(void);
@@ -142,10 +142,10 @@ err_code_t OpenDrone_Controller_Init(void)
 err_code_t OpenDrone_Controller_Update(void)
 {
     // Read raw RC
-    int16_t rc_roll_raw     = OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.roll;
-    int16_t rc_pitch_raw    = OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.pitch;
-    int16_t rc_yaw_raw      = OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.yaw;
-    int16_t rc_throttle_raw = OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
+    int16_t rc_roll_raw     = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll;
+    int16_t rc_pitch_raw    = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch;
+    int16_t rc_yaw_raw      = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
+    int16_t rc_throttle_raw = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle;
 
     // Normalize RC from 0..1000
     float rc_norm_roll  = ((float)rc_roll_raw  - 500.0f) / 500.0f;      // From 0..1000 to -1..+1
@@ -236,7 +236,7 @@ err_code_t OpenDrone_FC_Main(void)
 		PeriphIMU_UpdateGyro();
 		PeriphIMU_UpdateFilter();
 
-        int rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocol_Msg);
+        int rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
         if (rx_ret > 0) 
         {
             last_rx_time_us = hw_intf_get_time_us();
