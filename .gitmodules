@@ -4,9 +4,6 @@
 [submodule "Algorithm/pid_controller"]
 	path = Algorithm/pid_controller
 	url = git@github.com:phonght32/pid_controller.git
-[submodule "TxProtocol/OpenDrone_TxProtocol"]
-	path = TxProtocol/OpenDrone_TxProtocol
-	url = git@github.com:phonght32/OpenDrone_TxProtocol.git
 [submodule "Algorithm/clinalg"]
 	path = Algorithm/clinalg
 	url = git@github.com:phonght32/clinalg.git
