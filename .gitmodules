@@ -1,9 +1,6 @@
 [submodule "EscProtocol/esc_dshot"]
 	path = EscProtocol/esc_dshot
 	url = git@github.com:phonght32/esc_dshot.git
-[submodule "OSD/max7456"]
-	path = OSD/max7456
-	url = git@github.com:phonght32/max7456.git
 [submodule "Radio/nrf24l01"]
 	path = Radio/nrf24l01
 	url = git@github.com:phonght32/nrf24l01.git
