@@ -1,6 +1,3 @@
-[submodule "EscProtocol/esc_dshot"]
-	path = EscProtocol/esc_dshot
-	url = git@github.com:phonght32/esc_dshot.git
 [submodule "Algorithm/pid_controller"]
 	path = Algorithm/pid_controller
 	url = git@github.com:phonght32/pid_controller.git
