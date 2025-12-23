@@ -25,3 +25,9 @@
 [submodule "IMU/Filter/kalman_height_estimation"]
 	path = IMU/Filter/kalman_height_estimation
 	url = git@github.com:phonght32/kalman_height_estimation.git
+[submodule "Radio/Sensor/nrf24l01"]
+	path = Radio/Sensor/nrf24l01
+	url = git@github.com:phonght32/nrf24l01.git
+[submodule "Radio/Sensor/sx1278"]
+	path = Radio/Sensor/sx1278
+	url = git@github.com:phonght32/sx1278.git
