@@ -34,3 +34,6 @@
 [submodule "IMU/Sensor/mpu6050"]
 	path = IMU/Sensor/mpu6050
 	url = git@github.com:phonght32/mpu6050.git
+[submodule "IMU/Sensor/hmc5883l"]
+	path = IMU/Sensor/hmc5883l
+	url = git@github.com:phonght32/hmc5883l.git
