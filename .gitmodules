@@ -28,3 +28,9 @@
 [submodule "IMU/Sensor/bmp280"]
 	path = IMU/Sensor/bmp280
 	url = git@github.com:phonght32/bmp280.git
+[submodule "IMU/Filter/imu_madgwick"]
+	path = IMU/Filter/imu_madgwick
+	url = git@github.com:phonght32/imu_madgwick.git
+[submodule "IMU/Filter/kalman_height_estimation"]
+	path = IMU/Filter/kalman_height_estimation
+	url = git@github.com:phonght32/kalman_height_estimation.git
