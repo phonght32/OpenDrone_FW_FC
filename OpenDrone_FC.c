@@ -5,8 +5,9 @@
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
 #include "OpenDrone_TxProtocol.h"
-#include "Periph.h"
+#include "PeriphRadio.h"
 #include "PeriphIMU.h"
+#include "PeriphESC.h"
 #include "pid_controller.h"
 
 

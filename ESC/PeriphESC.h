@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef __PERIPH_H__
-#define __PERIPH_H__
+#ifndef __PERIPH_ESC_H__
+#define __PERIPH_ESC_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,16 +29,11 @@ extern "C" {
 
 #include "err_code.h"
 
-err_code_t PeriphController_Init(void);
-
 err_code_t PeriphEsc_Init(void);
 err_code_t PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle);
-
-err_code_t PeriphRadio_Init(void);
-err_code_t PeriphRadio_Receive(uint8_t *data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __PERIPH_H__ */
+#endif /* __PERIPH_ESC_H__ */
