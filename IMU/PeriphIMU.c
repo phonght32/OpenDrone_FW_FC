@@ -6,7 +6,7 @@
 #include "bmp280.h"
 #include "imu_madgwick.h"
 #include "kalman_height_estimation.h"
-#include "OpenDrone_IMU.h"
+#include "PeriphIMU.h"
 #include "OpenDrone_FC_Define.h"
 #include "OpenDrone_FC_HwIntf.h"
 
@@ -58,7 +58,7 @@ imu_madgwick_handle_t imu_madgwick_handle = NULL;
 kalman_height_estimation_handle_t kalman_height_estimation_handle = NULL;
 #endif
 
-err_code_t OpenDrone_IMU_Init(void)
+err_code_t PeriphIMU_Init(void)
 {
 #ifdef USE_MPU6050
 	mpu6050_handle = mpu6050_init();
@@ -194,7 +194,7 @@ err_code_t OpenDrone_IMU_Init(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_UpdateAccel(void)
+err_code_t PeriphIMU_UpdateAccel(void)
 {
 	err_code_t err_ret;
 	float accel_x, accel_y, accel_z;
@@ -230,7 +230,7 @@ err_code_t OpenDrone_IMU_UpdateAccel(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_UpdateGyro(void)
+err_code_t PeriphIMU_UpdateGyro(void)
 {
 	err_code_t err_ret;
 	float gyro_x, gyro_y, gyro_z;
@@ -262,7 +262,7 @@ err_code_t OpenDrone_IMU_UpdateGyro(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_UpdateMag(void)
+err_code_t PeriphIMU_UpdateMag(void)
 {
 	err_code_t err_ret;
 	float mag_x = 0, mag_y = 0, mag_z = 0;
@@ -287,7 +287,7 @@ err_code_t OpenDrone_IMU_UpdateMag(void)
 }
 
 #ifdef USE_BMP280
-err_code_t OpenDrone_IMU_UpdateBaro(void)
+err_code_t PeriphIMU_UpdateBaro(void)
 {
 	err_code_t err_ret;
 	float pressure = 0;
@@ -306,7 +306,7 @@ err_code_t OpenDrone_IMU_UpdateBaro(void)
 }
 #endif
 
-err_code_t OpenDrone_IMU_UpdateFilter(void)
+err_code_t PeriphIMU_UpdateFilter(void)
 {
 #ifdef USE_IMU_MADGWICK_6DOF
 	imu_madgwick_update_6dof(imu_madgwick_handle,
@@ -324,7 +324,7 @@ err_code_t OpenDrone_IMU_UpdateFilter(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_UpdateFilterHeight(void)
+err_code_t PeriphIMU_UpdateFilterHeight(void)
 {
 #ifdef USE_KALMAN_HEIGHT_ESTIMATION
 	float altitude = 0.0;
@@ -336,7 +336,7 @@ err_code_t OpenDrone_IMU_UpdateFilterHeight(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetAccel(float *accel_x, float *accel_y, float *accel_z)
+err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z)
 {
 	*accel_x = imu_data.accel_x;
 	*accel_y = imu_data.accel_y;
@@ -345,7 +345,7 @@ err_code_t OpenDrone_IMU_GetAccel(float *accel_x, float *accel_y, float *accel_z
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
+err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
 {
 	*gyro_x = imu_data.gyro_x;
 	*gyro_y = imu_data.gyro_y;
@@ -354,7 +354,7 @@ err_code_t OpenDrone_IMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
+err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
 {
 	*mag_x = imu_data.mag_x;
 	*mag_y = imu_data.mag_y;
@@ -363,14 +363,14 @@ err_code_t OpenDrone_IMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetBaro(float *baro)
+err_code_t PeriphIMU_GetBaro(float *baro)
 {
 	*baro = imu_data.pressure;
 
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetAngel(float *roll, float *pitch, float *yaw)
+err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 {
 	err_code_t err_ret;
 	float q0, q1, q2, q3;
@@ -388,7 +388,7 @@ err_code_t OpenDrone_IMU_GetAngel(float *roll, float *pitch, float *yaw)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_IMU_GetAltitude(float *altitude)
+err_code_t PeriphIMU_GetAltitude(float *altitude)
 {
 #ifdef USE_KALMAN_HEIGHT_ESTIMATION
 	kalman_height_estimation_get_height(kalman_height_estimation_handle, altitude);

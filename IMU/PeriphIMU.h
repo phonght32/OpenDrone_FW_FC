@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef __OPENDRONE_IMU_H__
-#define __OPENDRONE_IMU_H__
+#ifndef __PERIPH_IMU_H__
+#define __PERIPH_IMU_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,22 +29,22 @@ extern "C" {
 
 #include "err_code.h"
 
-err_code_t OpenDrone_IMU_Init(void);
-err_code_t OpenDrone_IMU_UpdateAccel(void);
-err_code_t OpenDrone_IMU_UpdateGyro(void);
-err_code_t OpenDrone_IMU_UpdateMag(void);
-err_code_t OpenDrone_IMU_UpdateBaro(void);
-err_code_t OpenDrone_IMU_UpdateFilter(void);
-err_code_t OpenDrone_IMU_UpdateFilterHeight(void);
-err_code_t OpenDrone_IMU_GetAccel(float *accel_x, float *accel_y, float *accel_z);
-err_code_t OpenDrone_IMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z);
-err_code_t OpenDrone_IMU_GetMag(float *mag_x, float *mag_y, float *mag_z);
-err_code_t OpenDrone_IMU_GetBaro(float *baro);
-err_code_t OpenDrone_IMU_GetAngel(float *roll, float *pitch, float *yaw);
-err_code_t OpenDrone_IMU_GetAltitude(float *altitude);
+err_code_t PeriphIMU_Init(void);
+err_code_t PeriphIMU_UpdateAccel(void);
+err_code_t PeriphIMU_UpdateGyro(void);
+err_code_t PeriphIMU_UpdateMag(void);
+err_code_t PeriphIMU_UpdateBaro(void);
+err_code_t PeriphIMU_UpdateFilter(void);
+err_code_t PeriphIMU_UpdateFilterHeight(void);
+err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z);
+err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z);
+err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z);
+err_code_t PeriphIMU_GetBaro(float *baro);
+err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw);
+err_code_t PeriphIMU_GetAltitude(float *altitude);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __OPENDRONE_IMU_H__ */
+#endif /* __PERIPH_IMU_H__ */

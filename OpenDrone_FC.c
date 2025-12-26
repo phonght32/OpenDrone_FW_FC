@@ -6,7 +6,7 @@
 #include "OpenDrone_FC_HwIntf.h"
 #include "OpenDrone_TxProtocol.h"
 #include "Periph.h"
-#include "OpenDrone_IMU.h"
+#include "PeriphIMU.h"
 #include "pid_controller.h"
 
 
@@ -166,10 +166,10 @@ err_code_t OpenDrone_Controller_Update(void)
     float throttle_out      = rc_norm_thr   * MOTOR_MAX;
 
     /* Read angle in deg */
-    OpenDrone_IMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
+    PeriphIMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
 
     /* Read gyro in deg/s */
-    OpenDrone_IMU_GetGyro(&roll_rate, &pitch_rate, &yaw_rate);
+    PeriphIMU_GetGyro(&roll_rate, &pitch_rate, &yaw_rate);
 
     /* Outer loop: angle -> desired rate */
     pid_controller_update(pid_angle_roll,  desired_roll_deg,  roll_angle,  &roll_angle_out);
@@ -214,7 +214,7 @@ err_code_t OpenDrone_Controller_Update(void)
 
 err_code_t OpenDrone_FC_Init(void)
 {
-	OpenDrone_IMU_Init();
+	PeriphIMU_Init();
 	PeriphRadio_Init();
 	PeriphEsc_Init();
 
@@ -233,9 +233,9 @@ err_code_t OpenDrone_FC_Main(void)
         // uint16_t throttle = 48 + OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
         // PeriphEsc_Send(48, throttle, 48, 48);
 
-		OpenDrone_IMU_UpdateAccel();
-		OpenDrone_IMU_UpdateGyro();
-		OpenDrone_IMU_UpdateFilter();
+		PeriphIMU_UpdateAccel();
+		PeriphIMU_UpdateGyro();
+		PeriphIMU_UpdateFilter();
 
         int rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
         if (rx_ret > 0) 
@@ -260,9 +260,9 @@ err_code_t OpenDrone_FC_Main(void)
 	/* Task low */
 	if ((current_time - last_time_us[IDX_TASK_LOW]) >= DURATION_TASK_LOW)
 	{
-		OpenDrone_IMU_UpdateMag();
-		OpenDrone_IMU_UpdateBaro();
-		OpenDrone_IMU_UpdateFilterHeight();
+		PeriphIMU_UpdateMag();
+		PeriphIMU_UpdateBaro();
+		PeriphIMU_UpdateFilterHeight();
 
 		cyclic_task_ms[IDX_TASK_LOW] = current_time - last_time_us[IDX_TASK_LOW];
 
@@ -287,9 +287,9 @@ static void OpenDrone_FC_PrintInfo(void)
 {
 	/* Send debug 9-DoF */
     // float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x, debug_gyro_y, debug_gyro_z, debug_mag_x, debug_mag_y, debug_mag_z;
-	// OpenDrone_IMU_GetAccel(&debug_accel_x, &debug_accel_y, &debug_accel_z);
-	// OpenDrone_IMU_GetGyro(&debug_gyro_x, &debug_gyro_y, &debug_gyro_z);
-	// OpenDrone_IMU_GetMag(&debug_mag_x, &debug_mag_y, &debug_mag_z);
+	// PeriphIMU_GetAccel(&debug_accel_x, &debug_accel_y, &debug_accel_z);
+	// PeriphIMU_GetGyro(&debug_gyro_x, &debug_gyro_y, &debug_gyro_z);
+	// PeriphIMU_GetMag(&debug_mag_x, &debug_mag_y, &debug_mag_z);
 
 	// sprintf((char *)log_buf, "\n%f,%f,%f,%f,%f,%f,%f,%f,%f",
 	//         debug_accel_x, debug_accel_y, debug_accel_z,
@@ -298,14 +298,14 @@ static void OpenDrone_FC_PrintInfo(void)
 	// hw_intf_uart_debug_send(log_buf, strlen(log_buf));
 
 	/* Send debug angle */
-    // OpenDrone_IMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
+    // PeriphIMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
     // sprintf((char *)log_buf, "%f,%f,%f\n", roll_angle, pitch_angle, yaw_angle);
     // hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
 	/* Send debug altitude */
     // float debug_altitude, debug_baro;
-	// OpenDrone_IMU_GetBaro(&debug_baro);
-	// OpenDrone_IMU_GetAltitude(&debug_altitude);
+	// PeriphIMU_GetBaro(&debug_baro);
+	// PeriphIMU_GetAltitude(&debug_altitude);
 	// sprintf((char *)log_buf, "%f,%f\n", debug_baro, debug_altitude * 100);
 	// hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
 
