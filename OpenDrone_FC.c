@@ -10,18 +10,18 @@
 #include "PeriphIMU.h"
 #include "PeriphRadio.h"
 
-#define IDX_TASK_HIGH 0
-#define IDX_TASK_MEDIUM 1
-#define IDX_TASK_LOW 2
-#define IDX_TASK_DEBUG 3
-#define NUM_OF_TASK 4
+#define IDX_TASK_HIGH               0
+#define IDX_TASK_MEDIUM             1
+#define IDX_TASK_LOW                2
+#define IDX_TASK_DEBUG              3
+#define NUM_OF_TASK                 4
 
-#define DURATION_TASK_HIGH 4000U    // 4 ms -> ~250 Hz control loop
-#define DURATION_TASK_MEDIUM 20000U // 20 ms
-#define DURATION_TASK_LOW 50000U    // 50 ms
-#define DURATION_TASK_DEBUG 200000U // 200 ms
+#define DURATION_TASK_HIGH          4000U    // 4 ms -> ~250 Hz control loop
+#define DURATION_TASK_MEDIUM        20000U // 20 ms
+#define DURATION_TASK_LOW           50000U    // 50 ms
+#define DURATION_TASK_DEBUG         200000U // 200 ms
 
-#define RADIO_TIMEOUT_US 500000U // 500 ms -> failsafe
+#define RADIO_TIMEOUT_US            500000U // 500 ms -> failsafe
 
 #ifdef USE_SERIAL_DEBUG
 uint8_t log_buf[128];
@@ -29,8 +29,7 @@ uint32_t cyclic_task_ms[NUM_OF_TASK];
 #endif
 
 static uint32_t last_rx_time_us = 0; // last time radio packet received
-static uint8_t is_armed =
-    1; // simple arming flag, handle with care in your system
+static uint8_t is_armed = 1; // simple arming flag, handle with care in your system
 uint16_t output_dshot_motors[4];
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
@@ -38,7 +37,8 @@ OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 
 static void OpenDrone_FC_PrintInfo(void);
 
-err_code_t OpenDrone_FC_Init(void) {
+err_code_t OpenDrone_FC_Init(void) 
+{
     PeriphIMU_Init();
     PeriphRadio_Init();
     PeriphEsc_Init();
@@ -47,7 +47,8 @@ err_code_t OpenDrone_FC_Init(void) {
     return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_FC_Main(void) {
+err_code_t OpenDrone_FC_Main(void) 
+{
     uint32_t current_time = hw_intf_get_time_us();
 
     /* Task high */
@@ -125,7 +126,8 @@ err_code_t OpenDrone_FC_Main(void) {
     return ERR_CODE_SUCCESS;
 }
 
-static void OpenDrone_FC_PrintInfo(void) {
+static void OpenDrone_FC_PrintInfo(void) 
+{
     /* Send debug 9-DoF */
     // float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x,
     // debug_gyro_y, debug_gyro_z, debug_mag_x, debug_mag_y, debug_mag_z;
