@@ -23,24 +23,15 @@
 
 #define RADIO_TIMEOUT_US            500000U
 
-typedef enum
-{
-    EN_MAINSTATE_IDLE,
-    EN_MAINSTATE_ARMING,
-    EN_MAINSTATE_RUNNING
-} enMainState_t;
-
 #ifdef USE_SERIAL_DEBUG
 uint8_t log_buf[128];
 uint32_t cyclic_task_ms[NUM_OF_TASK];
 #endif
 
-static enMainState_t main_state = EN_MAINSTATE_IDLE;
-
 static uint32_t last_time_us[NUM_OF_TASK] = {0};
 
 static uint32_t last_rx_time_us = 0; // last time radio packet received
-static uint8_t is_armed = 1; // simple arming flag, handle with care in your system
+static uint8_t is_armed = 0; // simple arming flag, handle with care in your system
 
 static OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 
@@ -51,6 +42,7 @@ static stPeriphController_Input_t controller_input;
 static stPeriphController_Output_t controller_output;
 
 static void OpenDrone_FC_PrintInfo(void);
+static void OpenDrone_FC_ParseRadioCommand(void);
 
 err_code_t OpenDrone_FC_Init(void)
 {
@@ -79,6 +71,8 @@ err_code_t OpenDrone_FC_Main(void)
             last_rx_time_us = hw_intf_get_time_us();
         }
 
+        OpenDrone_FC_ParseRadioCommand();
+
         /* Read angle in deg */
         PeriphIMU_GetAngel(&measured_angle_roll, &measured_angle_pitch, &measured_angle_yaw);
 
@@ -97,7 +91,6 @@ err_code_t OpenDrone_FC_Main(void)
         controller_input.measured_rate_yaw      = measured_rate_yaw;
 
         PeriphController_Update(&controller_input, &controller_output);
-
 
         if (is_armed)
         {
@@ -149,6 +142,26 @@ err_code_t OpenDrone_FC_Main(void)
     }
 
     return ERR_CODE_SUCCESS;
+}
+
+static void OpenDrone_FC_ParseRadioCommand(void)
+{
+    switch (OpenDrone_TxProtocolMsg.MsgId)
+    {
+    case OPENDRONE_TXPROTOCOLMSG_ID_ARM_DISARM:
+        if (OpenDrone_TxProtocolMsg.Payload.ArmDisarm.arm == 1)
+        {
+            is_armed = 1;
+        }
+        else
+        {
+            is_armed = 0;
+        }   
+        break;
+    
+    default:
+        break;
+    }
 }
 
 static void OpenDrone_FC_PrintInfo(void)
