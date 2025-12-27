@@ -31,9 +31,9 @@ extern "C" {
 
 typedef struct
 {
-	float rc_roll;
-	float rc_pitch;
-	float rc_yaw;
+	float rc_angle_roll;
+	float rc_angle_pitch;
+	float rc_rate_yaw;
 	float rc_throttle;
 	float measured_angle_roll;
 	float measured_angle_pitch;

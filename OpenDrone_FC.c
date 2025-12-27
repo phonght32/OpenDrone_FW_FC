@@ -34,6 +34,7 @@ static uint32_t last_rx_time_us = 0; // last time radio packet received
 static uint8_t is_armed = 0; // simple arming flag, handle with care in your system
 
 static OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
+int16_t rc_angle_roll, rc_angle_pitch, rc_rate_yaw, rc_throttle;
 
 static float measured_angle_roll, measured_angle_pitch, measured_angle_yaw;
 static float measured_rate_roll, measured_rate_pitch, measured_rate_yaw;
@@ -79,10 +80,10 @@ err_code_t OpenDrone_FC_Main(void)
         /* Read gyro in deg/s */
         PeriphIMU_GetGyro(&measured_rate_roll, &measured_rate_pitch, &measured_rate_yaw);
 
-        controller_input.rc_roll                = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll;
-        controller_input.rc_pitch               = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch;
-        controller_input.rc_yaw                 = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
-        controller_input.rc_throttle            = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle;
+        controller_input.rc_angle_roll        	= rc_angle_roll;
+        controller_input.rc_angle_pitch        	= rc_angle_pitch;
+        controller_input.rc_rate_yaw            = rc_rate_yaw;
+        controller_input.rc_throttle            = rc_throttle;
         controller_input.measured_angle_roll    = measured_angle_roll;
         controller_input.measured_angle_pitch   = measured_angle_pitch;
         controller_input.measured_angle_yaw     = measured_angle_yaw;
@@ -158,7 +159,12 @@ static void OpenDrone_FC_ParseRadioCommand(void)
             is_armed = 0;
         }   
         break;
-    
+    case OPENDRONE_TXPROTOCOLMSG_ID_STABILIZER_CONTROL:
+        rc_angle_roll   = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll;
+        rc_angle_pitch  = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch;
+        rc_rate_yaw    	= OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
+        rc_throttle     = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle;
+        break;
     default:
         break;
     }

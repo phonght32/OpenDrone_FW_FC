@@ -103,9 +103,9 @@ err_code_t PeriphController_Init(void)
 err_code_t PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput)
 {
 	// Read raw RC
-	int16_t rc_roll_raw     = aInput->rc_roll;
-	int16_t rc_pitch_raw    = aInput->rc_pitch;
-	int16_t rc_yaw_raw      = aInput->rc_yaw;
+	int16_t rc_roll_raw     = aInput->rc_angle_roll;
+	int16_t rc_pitch_raw    = aInput->rc_angle_pitch;
+	int16_t rc_yaw_raw      = aInput->rc_rate_yaw;
 	int16_t rc_throttle_raw = aInput->rc_throttle;
 
 	// Normalize RC from 0..1000
