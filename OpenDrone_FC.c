@@ -30,14 +30,19 @@ uint32_t cyclic_task_ms[NUM_OF_TASK];
 
 static uint32_t last_rx_time_us = 0; // last time radio packet received
 static uint8_t is_armed = 1; // simple arming flag, handle with care in your system
-uint16_t output_dshot_motors[4];
 
 uint32_t last_time_us[NUM_OF_TASK] = {0};
 OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 
+float measured_angle_roll, measured_angle_pitch, measured_angle_yaw;
+float measured_rate_roll, measured_rate_pitch, measured_rate_yaw;
+
+stPeriphController_Input_t controller_input;
+stPeriphController_Output_t controller_output;
+
 static void OpenDrone_FC_PrintInfo(void);
 
-err_code_t OpenDrone_FC_Init(void) 
+err_code_t OpenDrone_FC_Init(void)
 {
     PeriphIMU_Init();
     PeriphRadio_Init();
@@ -47,7 +52,7 @@ err_code_t OpenDrone_FC_Init(void)
     return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_FC_Main(void) 
+err_code_t OpenDrone_FC_Main(void)
 {
     uint32_t current_time = hw_intf_get_time_us();
 
@@ -66,20 +71,31 @@ err_code_t OpenDrone_FC_Main(void)
             last_rx_time_us = hw_intf_get_time_us();
         }
 
-        PeriphController_Update(
-            OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll,
-            OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch,
-            OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw,
-            OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle);
+        /* Read angle in deg */
+        PeriphIMU_GetAngel(&measured_angle_roll, &measured_angle_pitch, &measured_angle_yaw);
 
-        PeriphController_GetMotorControl(
-            &output_dshot_motors[0], &output_dshot_motors[1],
-            &output_dshot_motors[2], &output_dshot_motors[3]);
+        /* Read gyro in deg/s */
+        PeriphIMU_GetGyro(&measured_rate_roll, &measured_rate_pitch, &measured_rate_yaw);
+
+        controller_input.rc_roll                = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll;
+        controller_input.rc_pitch               = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch;
+        controller_input.rc_yaw                 = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
+        controller_input.rc_throttle            = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle;
+        controller_input.measured_angle_roll    = measured_angle_roll;
+        controller_input.measured_angle_pitch   = measured_angle_pitch;
+        controller_input.measured_angle_yaw     = measured_angle_yaw;
+        controller_input.measured_rate_roll     = measured_rate_roll;
+        controller_input.measured_rate_pitch    = measured_rate_pitch;
+        controller_input.measured_rate_yaw      = measured_rate_yaw;
+
+        PeriphController_Update(&controller_input, &controller_output);
 
         /* Only send if armed */
         if (is_armed) {
-            PeriphEsc_Send(output_dshot_motors[0], output_dshot_motors[1],
-                           output_dshot_motors[2], output_dshot_motors[3]);
+            PeriphEsc_Send(controller_output.dshot_m1,
+                           controller_output.dshot_m2,
+                           controller_output.dshot_m3,
+                           controller_output.dshot_m4);
 
             // sprintf((char *)log_buf, "%d,%d,%d,%d\n", dshot_motors[0],
             // dshot_motors[1], dshot_motors[2], dshot_motors[3]);
@@ -117,8 +133,7 @@ err_code_t OpenDrone_FC_Main(void)
 #ifdef USE_SERIAL_DEBUG
         OpenDrone_FC_PrintInfo();
 #endif
-        cyclic_task_ms[IDX_TASK_DEBUG] =
-            current_time - last_time_us[IDX_TASK_DEBUG];
+        cyclic_task_ms[IDX_TASK_DEBUG] = current_time - last_time_us[IDX_TASK_DEBUG];
 
         last_time_us[IDX_TASK_DEBUG] = current_time;
     }
@@ -126,7 +141,7 @@ err_code_t OpenDrone_FC_Main(void)
     return ERR_CODE_SUCCESS;
 }
 
-static void OpenDrone_FC_PrintInfo(void) 
+static void OpenDrone_FC_PrintInfo(void)
 {
     /* Send debug 9-DoF */
     // float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x,

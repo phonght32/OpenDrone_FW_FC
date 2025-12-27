@@ -24,14 +24,6 @@ pid_controller_handle_t pid_rate_pitch;
 pid_controller_handle_t pid_rate_yaw;
 #endif
 
-float roll_angle, pitch_angle, yaw_angle;
-float roll_rate, pitch_rate, yaw_rate;
-
-float roll_angle_out, pitch_angle_out;
-float roll_rate_out, pitch_rate_out, yaw_rate_out;
-
-uint16_t dshot_motors[4];
-
 static float clampf(float v, float a, float b) {
 	if (v < a)
 		return a;
@@ -108,13 +100,13 @@ err_code_t PeriphController_Init(void)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphController_Update(int16_t roll, int16_t pitch, int16_t yaw, int16_t throttle)
+err_code_t PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput)
 {
 	// Read raw RC
-	int16_t rc_roll_raw     = roll;
-	int16_t rc_pitch_raw    = pitch;
-	int16_t rc_yaw_raw      = yaw;
-	int16_t rc_throttle_raw = throttle;
+	int16_t rc_roll_raw     = aInput->rc_roll;
+	int16_t rc_pitch_raw    = aInput->rc_pitch;
+	int16_t rc_yaw_raw      = aInput->rc_yaw;
+	int16_t rc_throttle_raw = aInput->rc_throttle;
 
 	// Normalize RC from 0..1000
 	float rc_norm_roll  = ((float)rc_roll_raw  - 500.0f) / 500.0f;      // From 0..1000 to -1..+1
@@ -133,20 +125,16 @@ err_code_t PeriphController_Update(int16_t roll, int16_t pitch, int16_t yaw, int
 	float desired_yaw_rate  = rc_norm_yaw   * RC_YAW_SCALE_DPS;
 	float throttle_out      = rc_norm_thr   * MOTOR_MAX;
 
-	/* Read angle in deg */
-	PeriphIMU_GetAngel(&roll_angle, &pitch_angle, &yaw_angle);
-
-	/* Read gyro in deg/s */
-	PeriphIMU_GetGyro(&roll_rate, &pitch_rate, &yaw_rate);
-
 	/* Outer loop: angle -> desired rate */
-	pid_controller_update(pid_angle_roll,  desired_roll_deg,  roll_angle,  &roll_angle_out);
-	pid_controller_update(pid_angle_pitch, desired_pitch_deg, pitch_angle, &pitch_angle_out);
+	float roll_angle_out, pitch_angle_out;
+	float roll_rate_out, pitch_rate_out, yaw_rate_out;
+	pid_controller_update(pid_angle_roll,  desired_roll_deg, aInput->measured_angle_roll,  &roll_angle_out);
+	pid_controller_update(pid_angle_pitch, desired_pitch_deg, aInput->measured_angle_pitch, &pitch_angle_out);
 
 	/* Inner loop: rate -> torque (these outputs are contributions to mixer) */
-	pid_controller_update(pid_rate_roll,  roll_angle_out,  roll_rate,  &roll_rate_out);
-	pid_controller_update(pid_rate_pitch, pitch_angle_out, pitch_rate, &pitch_rate_out);
-	pid_controller_update(pid_rate_yaw,   desired_yaw_rate, yaw_rate,  &yaw_rate_out);
+	pid_controller_update(pid_rate_roll,  roll_angle_out, aInput->measured_rate_roll,  &roll_rate_out);
+	pid_controller_update(pid_rate_pitch, pitch_angle_out, aInput->measured_rate_pitch, &pitch_rate_out);
+	pid_controller_update(pid_rate_yaw,   desired_yaw_rate, aInput->measured_rate_yaw,  &yaw_rate_out);
 
 	/* Scale rate outputs to motor domain to avoid saturate */
 	float roll_contrib  = roll_rate_out  * RATE_TO_MOTOR_SCALE;
@@ -157,15 +145,11 @@ err_code_t PeriphController_Update(int16_t roll, int16_t pitch, int16_t yaw, int
 	float motors[4];
 	motor_mixer_quad_x(throttle_out, roll_contrib, pitch_contrib, yaw_contrib, motors);
 
-	/* Convert motor outputs (0..1000) to DShot range (48..2047) */
-	for (int i = 0; i < 4; i++) {
-		dshot_motors[i] = map_motor_to_dshot(motors[i]);
-	}
+	aOutput->dshot_m1 = map_motor_to_dshot(motors[0]);
+	aOutput->dshot_m2 = map_motor_to_dshot(motors[1]);
+	aOutput->dshot_m3 = map_motor_to_dshot(motors[2]);
+	aOutput->dshot_m4 = map_motor_to_dshot(motors[3]);
 
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphController_GetMotorControl(uint16_t *m1, uint16_t *m2, uint16_t *m3,  uint16_t *m4)
-{
-
-}

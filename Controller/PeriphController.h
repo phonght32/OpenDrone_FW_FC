@@ -29,9 +29,30 @@ extern "C" {
 
 #include "err_code.h"
 
+typedef struct
+{
+	float rc_roll;
+	float rc_pitch;
+	float rc_yaw;
+	float rc_throttle;
+	float measured_angle_roll;
+	float measured_angle_pitch;
+	float measured_angle_yaw;
+	float measured_rate_roll;
+	float measured_rate_pitch;
+	float measured_rate_yaw;
+} stPeriphController_Input_t;
+
+typedef struct
+{
+	uint16_t dshot_m1;
+	uint16_t dshot_m2;
+	uint16_t dshot_m3;
+	uint16_t dshot_m4;
+} stPeriphController_Output_t;
+
 err_code_t PeriphController_Init(void);
-err_code_t PeriphController_Update(int16_t roll, int16_t pitch, int16_t yaw, int16_t throttle);
-err_code_t PeriphController_GetMotorControl(uint16_t *m1, uint16_t *m2, uint16_t *m3,  uint16_t *m4);
+err_code_t PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput);
 
 #ifdef __cplusplus
 }
