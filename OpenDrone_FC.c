@@ -16,29 +16,39 @@
 #define IDX_TASK_DEBUG              3
 #define NUM_OF_TASK                 4
 
-#define DURATION_TASK_HIGH          4000U    // 4 ms -> ~250 Hz control loop
-#define DURATION_TASK_MEDIUM        20000U // 20 ms
-#define DURATION_TASK_LOW           50000U    // 50 ms
-#define DURATION_TASK_DEBUG         200000U // 200 ms
+#define DURATION_TASK_HIGH          4000U
+#define DURATION_TASK_MEDIUM        20000U
+#define DURATION_TASK_LOW           50000U
+#define DURATION_TASK_DEBUG         200000U
 
-#define RADIO_TIMEOUT_US            500000U // 500 ms -> failsafe
+#define RADIO_TIMEOUT_US            500000U
+
+typedef enum
+{
+    EN_MAINSTATE_IDLE,
+    EN_MAINSTATE_ARMING,
+    EN_MAINSTATE_RUNNING
+} enMainState_t;
 
 #ifdef USE_SERIAL_DEBUG
 uint8_t log_buf[128];
 uint32_t cyclic_task_ms[NUM_OF_TASK];
 #endif
 
+static enMainState_t main_state = EN_MAINSTATE_IDLE;
+
+static uint32_t last_time_us[NUM_OF_TASK] = {0};
+
 static uint32_t last_rx_time_us = 0; // last time radio packet received
 static uint8_t is_armed = 1; // simple arming flag, handle with care in your system
 
-uint32_t last_time_us[NUM_OF_TASK] = {0};
-OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
+static OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 
-float measured_angle_roll, measured_angle_pitch, measured_angle_yaw;
-float measured_rate_roll, measured_rate_pitch, measured_rate_yaw;
+static float measured_angle_roll, measured_angle_pitch, measured_angle_yaw;
+static float measured_rate_roll, measured_rate_pitch, measured_rate_yaw;
 
-stPeriphController_Input_t controller_input;
-stPeriphController_Output_t controller_output;
+static stPeriphController_Input_t controller_input;
+static stPeriphController_Output_t controller_output;
 
 static void OpenDrone_FC_PrintInfo(void);
 
@@ -57,17 +67,15 @@ err_code_t OpenDrone_FC_Main(void)
     uint32_t current_time = hw_intf_get_time_us();
 
     /* Task high */
-    if ((current_time - last_time_us[IDX_TASK_HIGH]) >= DURATION_TASK_HIGH) {
-        // uint16_t throttle = 48 +
-        // OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.throttle;
-        // PeriphEsc_Send(48, throttle, 48, 48);
-
+    if ((current_time - last_time_us[IDX_TASK_HIGH]) >= DURATION_TASK_HIGH)
+    {
         PeriphIMU_UpdateAccel();
         PeriphIMU_UpdateGyro();
         PeriphIMU_UpdateFilter();
 
         int rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
-        if (rx_ret > 0) {
+        if (rx_ret > 0)
+        {
             last_rx_time_us = hw_intf_get_time_us();
         }
 
@@ -90,17 +98,17 @@ err_code_t OpenDrone_FC_Main(void)
 
         PeriphController_Update(&controller_input, &controller_output);
 
-        /* Only send if armed */
-        if (is_armed) {
+
+        if (is_armed)
+        {
+            /* Only send if armed */
             PeriphEsc_Send(controller_output.dshot_m1,
                            controller_output.dshot_m2,
                            controller_output.dshot_m3,
                            controller_output.dshot_m4);
-
-            // sprintf((char *)log_buf, "%d,%d,%d,%d\n", dshot_motors[0],
-            // dshot_motors[1], dshot_motors[2], dshot_motors[3]);
-            // hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
-        } else {
+        }
+        else
+        {
             /* Disarmed: send idle (48) to keep ESC alive but motors stopped */
             PeriphEsc_Send(48, 48, 48, 48);
         }
@@ -110,15 +118,16 @@ err_code_t OpenDrone_FC_Main(void)
     }
 
     /* Task medium */
-    if ((current_time - last_time_us[IDX_TASK_MEDIUM]) >= DURATION_TASK_MEDIUM) {
-        cyclic_task_ms[IDX_TASK_MEDIUM] =
-            current_time - last_time_us[IDX_TASK_MEDIUM];
+    if ((current_time - last_time_us[IDX_TASK_MEDIUM]) >= DURATION_TASK_MEDIUM)
+    {
+        cyclic_task_ms[IDX_TASK_MEDIUM] = current_time - last_time_us[IDX_TASK_MEDIUM];
 
         last_time_us[IDX_TASK_MEDIUM] = current_time;
     }
 
     /* Task low */
-    if ((current_time - last_time_us[IDX_TASK_LOW]) >= DURATION_TASK_LOW) {
+    if ((current_time - last_time_us[IDX_TASK_LOW]) >= DURATION_TASK_LOW)
+    {
         PeriphIMU_UpdateMag();
         PeriphIMU_UpdateBaro();
         PeriphIMU_UpdateFilterHeight();
@@ -129,7 +138,8 @@ err_code_t OpenDrone_FC_Main(void)
     }
 
     /* Task debug */
-    if ((current_time - last_time_us[IDX_TASK_DEBUG]) >= DURATION_TASK_DEBUG) {
+    if ((current_time - last_time_us[IDX_TASK_DEBUG]) >= DURATION_TASK_DEBUG)
+    {
 #ifdef USE_SERIAL_DEBUG
         OpenDrone_FC_PrintInfo();
 #endif
