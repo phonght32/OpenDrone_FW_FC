@@ -72,6 +72,16 @@ err_code_t OpenDrone_FC_Main(void)
             last_rx_time_us = hw_intf_get_time_us();
         }
 
+        if ((current_time - last_rx_time_us) > RADIO_TIMEOUT_US)
+        {
+            /* Radio timeout: disarm */
+            is_armed = 0;
+            rc_angle_roll   = 0;
+            rc_angle_pitch  = 0;
+            rc_rate_yaw    	= 0;
+            rc_throttle     = 0;
+        }
+
         OpenDrone_FC_ParseRadioCommand();
 
         /* Read angle in deg */
