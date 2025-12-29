@@ -27,21 +27,21 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
+#include "stdint.h"
 
-err_code_t PeriphIMU_Init(void);
-err_code_t PeriphIMU_UpdateAccel(void);
-err_code_t PeriphIMU_UpdateGyro(void);
-err_code_t PeriphIMU_UpdateMag(void);
-err_code_t PeriphIMU_UpdateBaro(void);
-err_code_t PeriphIMU_UpdateFilter(void);
-err_code_t PeriphIMU_UpdateFilterHeight(void);
-err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z);
-err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z);
-err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z);
-err_code_t PeriphIMU_GetBaro(float *baro);
-err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw);
-err_code_t PeriphIMU_GetAltitude(float *altitude);
+void PeriphIMU_Init(void);
+void PeriphIMU_UpdateAccel(void);
+void PeriphIMU_UpdateGyro(void);
+void PeriphIMU_UpdateMag(void);
+void PeriphIMU_UpdateBaro(void);
+void PeriphIMU_UpdateFilter(void);
+void PeriphIMU_UpdateFilterHeight(void);
+void PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z);
+void PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z);
+void PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z);
+void PeriphIMU_GetBaro(float *baro);
+void PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw);
+void PeriphIMU_GetAltitude(float *altitude);
 
 #ifdef __cplusplus
 }

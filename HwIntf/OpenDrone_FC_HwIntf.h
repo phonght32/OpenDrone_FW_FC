@@ -27,7 +27,6 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
 #include "bmp280.h"
 #include "icm42688.h"
 #include "qmc5883l.h"
@@ -39,7 +38,7 @@ uint32_t hw_intf_get_time_us(void);
 void hw_intf_delay_ms(uint32_t time_ms);
 
 #ifdef USE_SERIAL_DEBUG
-err_code_t hw_intf_uart_debug_send(uint8_t *log_buf, uint16_t len);
+void hw_intf_uart_debug_send(uint8_t *log_buf, uint16_t len);
 #endif
 
 #ifdef USE_NRF24L01

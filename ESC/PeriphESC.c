@@ -15,7 +15,7 @@ uint32_t bl_esc_dshot_dmabuffer[DSHOT_DMA_BUFFER];
 uint32_t br_esc_dshot_dmabuffer[DSHOT_DMA_BUFFER];
 #endif
 
-err_code_t PeriphEsc_Init(void)
+void PeriphEsc_Init(void)
 {
 #ifdef USE_ESC_DSHOT
 	fl_esc_dshot_handle = esc_dshot_init();
@@ -58,11 +58,9 @@ err_code_t PeriphEsc_Init(void)
 	esc_dshot_config(br_esc_dshot_handle);
 
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle)
+void PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle)
 {
 #ifdef USE_ESC_DSHOT
 	esc_dshot_prepare_packet(fl_esc_dshot_handle, fl_throttle, fl_esc_dshot_dmabuffer);
@@ -75,6 +73,4 @@ err_code_t PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t b
 	esc_dshot_send_packet(bl_esc_dshot_handle, bl_esc_dshot_dmabuffer);
 	esc_dshot_send_packet(br_esc_dshot_handle, br_esc_dshot_dmabuffer);
 #endif
-
-	return ERR_CODE_SUCCESS;
 }

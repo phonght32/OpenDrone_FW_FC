@@ -27,10 +27,10 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
+#include "stdint.h"
 
-err_code_t PeriphEsc_Init(void);
-err_code_t PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle);
+void PeriphEsc_Init(void);
+void PeriphEsc_Send(uint16_t fl_throttle, uint16_t fr_throttle, uint16_t bl_throttle, uint16_t br_throttle);
 
 #ifdef __cplusplus
 }

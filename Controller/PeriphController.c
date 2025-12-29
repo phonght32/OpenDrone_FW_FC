@@ -57,7 +57,7 @@ static void motor_mixer_quad_x(float throttle, float roll_cmd, float pitch_cmd,
 	}
 }
 
-err_code_t PeriphController_Init(void)
+void PeriphController_Init(void)
 {
 	// Outer angle PID config (produces desired rate in deg/s typically)
 	pid_controller_cfg_t cfg_angle = {
@@ -96,11 +96,9 @@ err_code_t PeriphController_Init(void)
 	pid_controller_set_config(pid_rate_roll,  cfg_rate);
 	pid_controller_set_config(pid_rate_pitch, cfg_rate);
 	pid_controller_set_config(pid_rate_yaw,   cfg_rate);
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput)
+void PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput)
 {
 	// Read raw RC
 	int16_t rc_roll_raw     = aInput->rc_angle_roll;
@@ -149,7 +147,5 @@ err_code_t PeriphController_Update(const stPeriphController_Input_t *aInput, stP
 	aOutput->dshot_m2 = map_motor_to_dshot(motors[1]);
 	aOutput->dshot_m3 = map_motor_to_dshot(motors[2]);
 	aOutput->dshot_m4 = map_motor_to_dshot(motors[3]);
-
-	return ERR_CODE_SUCCESS;
 }
 

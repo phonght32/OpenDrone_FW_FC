@@ -45,17 +45,15 @@ static stPeriphController_Output_t controller_output;
 static void OpenDrone_FC_PrintInfo(void);
 static void OpenDrone_FC_ParseRadioCommand(void);
 
-err_code_t OpenDrone_FC_Init(void)
+void OpenDrone_FC_Init(void)
 {
     PeriphIMU_Init();
     PeriphRadio_Init();
     PeriphEsc_Init();
     PeriphController_Init();
-
-    return ERR_CODE_SUCCESS;
 }
 
-err_code_t OpenDrone_FC_Main(void)
+void OpenDrone_FC_Main(void)
 {
     uint32_t current_time = hw_intf_get_time_us();
 
@@ -151,8 +149,6 @@ err_code_t OpenDrone_FC_Main(void)
 
         last_time_us[IDX_TASK_DEBUG] = current_time;
     }
-
-    return ERR_CODE_SUCCESS;
 }
 
 static void OpenDrone_FC_ParseRadioCommand(void)

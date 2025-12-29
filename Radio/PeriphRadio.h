@@ -27,10 +27,11 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
+#include "stdint.h"
+#include "OpenDrone_FC_Config.h"
 
-err_code_t PeriphRadio_Init(void);
-err_code_t PeriphRadio_Receive(uint8_t *data);
+void PeriphRadio_Init(void);
+OpenDrone_FC_Status_t PeriphRadio_Receive(uint8_t *data);
 
 #ifdef __cplusplus
 }

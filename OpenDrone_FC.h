@@ -27,10 +27,10 @@
 extern "C" {
 #endif
 
-#include "err_code.h"
+#include "stdint.h"
 
-err_code_t OpenDrone_FC_Init(void);
-err_code_t OpenDrone_FC_Main(void);
+void OpenDrone_FC_Init(void);
+void OpenDrone_FC_Main(void);
 
 #ifdef __cplusplus
 }

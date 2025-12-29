@@ -15,7 +15,7 @@ nrf24l01_handle_t nrf24l01_handle;
 sx1278_handle_t sx1278_handle;
 #endif
 
-err_code_t PeriphRadio_Init(void)
+void PeriphRadio_Init(void)
 {
 #ifdef USE_NRF24L01
 	nrf24l01_handle = nrf24l01_init();
@@ -34,7 +34,7 @@ err_code_t PeriphRadio_Init(void)
 		.set_cs 			= hw_intf_nrf24l01_set_cs,
 		.set_ce 			= hw_intf_nrf24l01_set_ce,
 		.get_irq 			= hw_intf_nrf24l01_get_irq,
-		.delay 				= HAL_Delay
+		.delay 				= hw_intf_delay_ms
 	};
 	nrf24l01_set_config(nrf24l01_handle, nrf24l01_cfg);
 	nrf24l01_config(nrf24l01_handle);
@@ -61,11 +61,9 @@ err_code_t PeriphRadio_Init(void)
 	sx1278_set_config(sx1278_handle, sx1278_cfg);
 	sx1278_config(sx1278_handle);
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphRadio_Receive(uint8_t *data)
+OpenDrone_FC_Status_t PeriphRadio_Receive(uint8_t *data)
 {
 #ifdef USE_NRF24L01
 	uint8_t irq_level;
@@ -89,5 +87,5 @@ err_code_t PeriphRadio_Receive(uint8_t *data)
 	sx1278_lora_receive(sx1278_handle, data);
 #endif
 
-	return ERR_CODE_SUCCESS;
+	return OPENDRONE_FC_STATUS_SUCCESS;
 }

@@ -20,42 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef __PERIPH_CONTROLLER_H__
-#define __PERIPH_CONTROLLER_H__
+#ifndef __OPENDRONE_FC_CONFIG_H__
+#define __OPENDRONE_FC_CONFIG_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "stdint.h"
-
-typedef struct
+typedef enum 
 {
-	float rc_angle_roll;
-	float rc_angle_pitch;
-	float rc_rate_yaw;
-	float rc_throttle;
-	float measured_angle_roll;
-	float measured_angle_pitch;
-	float measured_angle_yaw;
-	float measured_rate_roll;
-	float measured_rate_pitch;
-	float measured_rate_yaw;
-} stPeriphController_Input_t;
-
-typedef struct
-{
-	uint16_t dshot_m1;
-	uint16_t dshot_m2;
-	uint16_t dshot_m3;
-	uint16_t dshot_m4;
-} stPeriphController_Output_t;
-
-void PeriphController_Init(void);
-void PeriphController_Update(const stPeriphController_Input_t *aInput, stPeriphController_Output_t *aOutput);
+    OPENDRONE_FC_STATUS_SUCCESS,
+    OPENDRONE_FC_STATUS_FAILED
+} OpenDrone_FC_Status_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __PERIPH_CONTROLLER_H__ */
+#endif /* __OPENDRONE_FC_CONFIG_H__ */

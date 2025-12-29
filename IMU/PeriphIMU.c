@@ -58,7 +58,7 @@ imu_madgwick_handle_t imu_madgwick_handle = NULL;
 kalman_height_estimation_handle_t kalman_height_estimation_handle = NULL;
 #endif
 
-err_code_t PeriphIMU_Init(void)
+void PeriphIMU_Init(void)
 {
 #ifdef USE_MPU6050
 	mpu6050_handle = mpu6050_init();
@@ -102,7 +102,7 @@ err_code_t PeriphIMU_Init(void)
 		.spi_send 		= hw_intf_icm42688_spi_send,
 		.spi_recv 		= hw_intf_icm42688_spi_recv,
 		.set_cs  		= hw_intf_icm42688_set_cs,
-		.delay 			= HAL_Delay
+		.delay 			= hw_intf_delay_ms
 	};
 	icm42688_set_config(icm42688_handle, icm42688_cfg);
 	icm42688_config(icm42688_handle);
@@ -149,7 +149,7 @@ err_code_t PeriphIMU_Init(void)
 		.soft_bias_c33   = 0.7179876576597246,
 		.i2c_send 		= hw_intf_qmc5883l_i2c_send,
 		.i2c_recv 		= hw_intf_qmc5883l_i2c_recv,
-		.delay 			= HAL_Delay
+		.delay 			= hw_intf_delay_ms
 	};
 	qmc5883l_set_config(qmc5883l_handle, qmc5883l_cfg);
 	qmc5883l_config(qmc5883l_handle);
@@ -166,7 +166,7 @@ err_code_t PeriphIMU_Init(void)
 		.comm_mode                  = CONFIG_BMP280_COMM_MODE,
 		.i2c_send                   = hw_intf_bmp280_i2c_send,
 		.i2c_recv                   = hw_intf_bmp280_i2c_recv,
-		.delay                      = HAL_Delay,
+		.delay                      = hw_intf_delay_ms,
 	};
 	bmp280_handle = bmp280_init();
 	bmp280_set_config(bmp280_handle, bmp280_cfg);
@@ -189,14 +189,10 @@ err_code_t PeriphIMU_Init(void)
 	kalman_height_estimation_set_config(kalman_height_estimation_handle, kalman_height_estimation_cfg);
 	kalman_height_estimation_config(kalman_height_estimation_handle);
 #endif
-
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_UpdateAccel(void)
+void PeriphIMU_UpdateAccel(void)
 {
-	err_code_t err_ret;
 	float accel_x, accel_y, accel_z;
 
 #ifdef USE_MPU6050
@@ -208,10 +204,9 @@ err_code_t PeriphIMU_UpdateAccel(void)
 #endif
 
 #ifdef USE_ICM42688
-	err_ret = icm42688_get_accel_scale(icm42688_handle, &accel_x, &accel_y, &accel_z);
-	if (err_ret != ERR_CODE_SUCCESS)
+	if (ICM42688_STATUS_SUCCESS != icm42688_get_accel_scale(icm42688_handle, &accel_x, &accel_y, &accel_z))
 	{
-		return err_ret;
+		return;
 	}
 #endif
 
@@ -226,13 +221,10 @@ err_code_t PeriphIMU_UpdateAccel(void)
 #ifdef USE_SERIAL_DEBUG
 
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_UpdateGyro(void)
+void PeriphIMU_UpdateGyro(void)
 {
-	err_code_t err_ret;
 	float gyro_x, gyro_y, gyro_z;
 
 #ifdef USE_MPU6050
@@ -244,10 +236,9 @@ err_code_t PeriphIMU_UpdateGyro(void)
 #endif
 
 #ifdef USE_ICM42688
-	err_ret = icm42688_get_gyro_scale(icm42688_handle, &gyro_x, &gyro_y, &gyro_z);
-	if (err_ret != ERR_CODE_SUCCESS)
+	if (ICM42688_STATUS_SUCCESS != icm42688_get_gyro_scale(icm42688_handle, &gyro_x, &gyro_y, &gyro_z))
 	{
-		return err_ret;
+		return;
 	}
 #endif
 
@@ -258,20 +249,18 @@ err_code_t PeriphIMU_UpdateGyro(void)
 	imu_data.gyro_x = gyro_y;
 	imu_data.gyro_y = gyro_x;
 	imu_data.gyro_z = -gyro_z;
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_UpdateMag(void)
+void PeriphIMU_UpdateMag(void)
 {
-	err_code_t err_ret;
+	qmc5883l_status_t err_ret;
 	float mag_x = 0, mag_y = 0, mag_z = 0;
 
 #ifdef USE_QMC5883L
 	err_ret = qmc5883l_get_mag_calib(qmc5883l_handle, &mag_x, &mag_y, &mag_z);
-	if (err_ret != ERR_CODE_SUCCESS)
+	if (err_ret != QMC5883L_STATUS_SUCCESS)
 	{
-		return err_ret;
+		return;
 	}
 #endif
 
@@ -282,31 +271,27 @@ err_code_t PeriphIMU_UpdateMag(void)
 	imu_data.mag_x = -mag_y;
 	imu_data.mag_y = mag_x;
 	imu_data.mag_z = -mag_z;
-
-	return ERR_CODE_SUCCESS;
 }
 
 #ifdef USE_BMP280
-err_code_t PeriphIMU_UpdateBaro(void)
+void PeriphIMU_UpdateBaro(void)
 {
-	err_code_t err_ret;
+	bmp280_status_t err_ret;
 	float pressure = 0;
 
 #ifdef USE_BMP280
 	err_ret = bmp280_get_pressure(bmp280_handle, &pressure);
-	if (err_ret != ERR_CODE_SUCCESS)
+	if (err_ret != BMP280_STATUS_SUCCESS)
 	{
-		return err_ret;
+		return;
 	}
 #endif
 
 	imu_data.pressure = pressure;
-
-	return ERR_CODE_SUCCESS;
 }
 #endif
 
-err_code_t PeriphIMU_UpdateFilter(void)
+void PeriphIMU_UpdateFilter(void)
 {
 #ifdef USE_IMU_MADGWICK_6DOF
 	imu_madgwick_update_6dof(imu_madgwick_handle,
@@ -320,11 +305,9 @@ err_code_t PeriphIMU_UpdateFilter(void)
 	                         imu_data.accel_x, imu_data.accel_y, imu_data.accel_z,
 	                         imu_data.mag_x, imu_data.mag_y, imu_data.mag_z);
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_UpdateFilterHeight(void)
+void PeriphIMU_UpdateFilterHeight(void)
 {
 #ifdef USE_KALMAN_HEIGHT_ESTIMATION
 	float altitude = 0.0;
@@ -332,67 +315,53 @@ err_code_t PeriphIMU_UpdateFilterHeight(void)
 
 	kalman_height_estimation_update(kalman_height_estimation_handle, imu_data.accel_z*0.99 - 9.99f, altitude);
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z)
+void PeriphIMU_GetAccel(float *accel_x, float *accel_y, float *accel_z)
 {
 	*accel_x = imu_data.accel_x;
 	*accel_y = imu_data.accel_y;
 	*accel_z = imu_data.accel_z;
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
+void PeriphIMU_GetGyro(float *gyro_x, float *gyro_y, float *gyro_z)
 {
 	*gyro_x = imu_data.gyro_x;
 	*gyro_y = imu_data.gyro_y;
 	*gyro_z = imu_data.gyro_z;
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
+void PeriphIMU_GetMag(float *mag_x, float *mag_y, float *mag_z)
 {
 	*mag_x = imu_data.mag_x;
 	*mag_y = imu_data.mag_y;
 	*mag_z = imu_data.mag_z;
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetBaro(float *baro)
+void PeriphIMU_GetBaro(float *baro)
 {
 	*baro = imu_data.pressure;
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
+void PeriphIMU_GetAngel(float *roll, float *pitch, float *yaw)
 {
-	err_code_t err_ret;
+	imu_madgwick_status_t err_ret;
 	float q0, q1, q2, q3;
 
 	err_ret = imu_madgwick_get_quaternion(imu_madgwick_handle, &q0, &q1, &q2, &q3);
-	if (err_ret != ERR_CODE_SUCCESS)
+	if (err_ret != IMU_MADGWICK_STATUS_SUCCESS)
 	{
-		return err_ret;
+		return;
 	}
 
 	*roll = 180.0 / 3.14 * atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
 	*pitch = 180.0 / 3.14 * asin(2 * (q0 * q2 - q3 * q1));
 	*yaw = 180.0 / 3.14 * atan2f(q0 * q3 + q1 * q2, 0.5f - q2 * q2 - q3 * q3);
-
-	return ERR_CODE_SUCCESS;
 }
 
-err_code_t PeriphIMU_GetAltitude(float *altitude)
+void PeriphIMU_GetAltitude(float *altitude)
 {
 #ifdef USE_KALMAN_HEIGHT_ESTIMATION
 	kalman_height_estimation_get_height(kalman_height_estimation_handle, altitude);
 #endif
-
-	return ERR_CODE_SUCCESS;
 }
