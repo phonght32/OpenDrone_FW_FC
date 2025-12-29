@@ -28,6 +28,11 @@ extern "C" {
 #endif
 
 #include "err_code.h"
+#include "bmp280.h"
+#include "icm42688.h"
+#include "qmc5883l.h"
+#include "nrf24l01.h"
+#include "esc_dshot.h"
 #include "OpenDrone_FC_Define.h"
 
 uint32_t hw_intf_get_time_us(void);
@@ -38,11 +43,11 @@ err_code_t hw_intf_uart_debug_send(uint8_t *log_buf, uint16_t len);
 #endif
 
 #ifdef USE_NRF24L01
-err_code_t hw_intf_nrf24l01_spi_send(uint8_t *buf_send, uint16_t len);
-err_code_t hw_intf_nrf24l01_spi_recv(uint8_t *buf_recv, uint16_t len);
-err_code_t hw_intf_nrf24l01_set_cs(uint8_t level);
-err_code_t hw_intf_nrf24l01_set_ce(uint8_t level);
-err_code_t hw_intf_nrf24l01_get_irq(uint8_t *level);
+nrf24l01_status_t hw_intf_nrf24l01_spi_send(uint8_t *buf_send, uint16_t len);
+nrf24l01_status_t hw_intf_nrf24l01_spi_recv(uint8_t *buf_recv, uint16_t len);
+nrf24l01_status_t hw_intf_nrf24l01_set_cs(uint8_t level);
+nrf24l01_status_t hw_intf_nrf24l01_set_ce(uint8_t level);
+nrf24l01_status_t hw_intf_nrf24l01_get_irq(uint8_t *level);
 #endif
 
 #ifdef USE_SX1278
@@ -59,9 +64,9 @@ err_code_t hw_intf_mpu6050_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len
 #endif
 
 #ifdef USE_ICM42688
-err_code_t hw_intf_icm42688_spi_send(uint8_t *buf_send, uint16_t len);
-err_code_t hw_intf_icm42688_spi_recv(uint8_t *buf_recv, uint16_t len);
-err_code_t hw_intf_icm42688_set_cs(uint8_t level);
+icm42688_status_t hw_intf_icm42688_spi_send(uint8_t *buf_send, uint16_t len);
+icm42688_status_t hw_intf_icm42688_spi_recv(uint8_t *buf_recv, uint16_t len);
+icm42688_status_t hw_intf_icm42688_set_cs(uint8_t level);
 #endif
 
 #ifdef USE_HMC5883L
@@ -70,20 +75,20 @@ err_code_t hw_intf_hmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t le
 #endif
 
 #ifdef USE_QMC5883L
-err_code_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len);
-err_code_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+qmc5883l_status_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+qmc5883l_status_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
 #endif
 
 #ifdef USE_BMP280
-err_code_t hw_intf_bmp280_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len);
-err_code_t hw_intf_bmp280_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+bmp280_status_t hw_intf_bmp280_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len);
+bmp280_status_t hw_intf_bmp280_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len);
 #endif
 
 #ifdef USE_ESC_DSHOT
-err_code_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma);
-err_code_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma);
-err_code_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma);
-err_code_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma);
+esc_dshot_status_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma);
+esc_dshot_status_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma);
+esc_dshot_status_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma);
+esc_dshot_status_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma);
 #endif
 
 #ifdef __cplusplus

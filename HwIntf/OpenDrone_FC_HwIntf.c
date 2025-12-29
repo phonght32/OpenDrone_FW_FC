@@ -18,27 +18,27 @@ __weak err_code_t hw_intf_uart_debug_send(uint8_t *log_buf, uint16_t len)
 #endif
 
 #ifdef USE_NRF24L01
-__weak err_code_t hw_intf_nrf24l01_spi_send(uint8_t *buf_send, uint16_t len)
+__weak nrf24l01_status_t hw_intf_nrf24l01_spi_send(uint8_t *buf_send, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_nrf24l01_spi_recv(uint8_t *buf_recv, uint16_t len)
+__weak nrf24l01_status_t hw_intf_nrf24l01_spi_recv(uint8_t *buf_recv, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_nrf24l01_set_cs(uint8_t level)
+__weak nrf24l01_status_t hw_intf_nrf24l01_set_cs(uint8_t level)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_nrf24l01_set_ce(uint8_t level)
+__weak nrf24l01_status_t hw_intf_nrf24l01_set_ce(uint8_t level)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_nrf24l01_get_irq(uint8_t *level)
+__weak nrf24l01_status_t hw_intf_nrf24l01_get_irq(uint8_t *level)
 {
 	return ERR_CODE_SUCCESS;
 }
@@ -96,71 +96,71 @@ __weak err_code_t hw_intf_hmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint
 #endif
 
 #ifdef USE_QMC5883L
-__weak err_code_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+__weak qmc5883l_status_t hw_intf_qmc5883l_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+__weak qmc5883l_status_t hw_intf_qmc5883l_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 #endif
 
 #ifdef USE_BMP280
-__weak err_code_t hw_intf_bmp280_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+__weak bmp280_status_t hw_intf_bmp280_i2c_send(uint8_t reg_addr, uint8_t *buf, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_bmp280_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len)
+__weak bmp280_status_t hw_intf_bmp280_i2c_recv(uint8_t reg_addr, uint8_t *buf, uint16_t len)
 {
 	return ERR_CODE_SUCCESS;
 }
 #endif
 
 #ifdef USE_ESC_DSHOT
-__weak err_code_t hw_intf_fl_esc_dshot_set_auto_reload(uint32_t auto_reload)
+__weak esc_dshot_status_t hw_intf_fl_esc_dshot_set_auto_reload(uint32_t auto_reload)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_fr_esc_dshot_set_auto_reload(uint32_t auto_reload)
+__weak esc_dshot_status_t hw_intf_fr_esc_dshot_set_auto_reload(uint32_t auto_reload)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_bl_esc_dshot_set_auto_reload(uint32_t auto_reload)
+__weak esc_dshot_status_t hw_intf_bl_esc_dshot_set_auto_reload(uint32_t auto_reload)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_br_esc_dshot_set_auto_reload(uint32_t auto_reload)
+__weak esc_dshot_status_t hw_intf_br_esc_dshot_set_auto_reload(uint32_t auto_reload)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma)
+__weak esc_dshot_status_t hw_intf_fl_esc_dshot_send_dma(uint32_t *packet_dma)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma)
+__weak esc_dshot_status_t hw_intf_fr_esc_dshot_send_dma(uint32_t *packet_dma)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma)
+__weak esc_dshot_status_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma)
+__weak esc_dshot_status_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma)
 {
 	return ERR_CODE_SUCCESS;
 }
 
-__weak err_code_t hw_intf_esc_dshot_start(void)
+__weak esc_dshot_status_t hw_intf_esc_dshot_start(void)
 {
 	return ERR_CODE_SUCCESS;
 }
