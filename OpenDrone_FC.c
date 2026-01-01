@@ -21,7 +21,7 @@
 #define DURATION_TASK_LOW           50000U
 #define DURATION_TASK_DEBUG         200000U
 
-#define RADIO_TIMEOUT_US            500000U
+#define RADIO_TIMEOUT_US            1000000U
 
 #ifdef USE_SERIAL_DEBUG
 uint8_t log_buf[128];
@@ -34,6 +34,7 @@ typedef enum
     OPEN_DRONE_FC_STATE_ARMING,
     OPEN_DRONE_FC_STATE_WATING_FOR_ARM,
     OPEN_DRONE_FC_STATE_RUNNING,
+    OPEN_DRONE_FC_STATE_FAILSAFE,
     OPEN_DRONE_FC_STATE_STOPPING
 } OpenDrone_FC_State_t;
 
@@ -41,7 +42,8 @@ typedef enum
 {
     OPEN_DRONE_FC_EVENT_NONE,
     OPEN_DRONE_FC_EVENT_ARM,
-    OPEN_DRONE_FC_EVENT_DISARM
+    OPEN_DRONE_FC_EVENT_DISARM,
+    OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT
 } OpenDrone_FC_Event_t;
 
 OpenDrone_FC_Event_t new_event = OPEN_DRONE_FC_EVENT_NONE;
@@ -84,7 +86,13 @@ void OpenDrone_FC_Main(void)
     rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
     if (rx_ret == OPENDRONE_FC_STATUS_SUCCESS)
     {
+        last_rx_time_us = current_time;
         OpenDrone_FC_ParseRadioCommand();
+    }
+
+    if ((current_time - last_rx_time_us) >= RADIO_TIMEOUT_US)
+    {
+        new_event = OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT;
     }
 
     switch (main_state)
@@ -96,6 +104,7 @@ void OpenDrone_FC_Main(void)
     case OPEN_DRONE_FC_STATE_WATING_FOR_ARM:
         if (new_event == OPEN_DRONE_FC_EVENT_ARM)
         {
+            new_event = OPEN_DRONE_FC_EVENT_NONE;
             main_state = OPEN_DRONE_FC_STATE_ARMING;
             arming_start_time = current_time;
         }
@@ -116,8 +125,14 @@ void OpenDrone_FC_Main(void)
     case OPEN_DRONE_FC_STATE_RUNNING:
         if (new_event == OPEN_DRONE_FC_EVENT_DISARM)
         {
+            new_event = OPEN_DRONE_FC_EVENT_NONE;
             main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
             is_armed = 0;
+        }
+        else if (new_event == OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT)
+        {
+            new_event = OPEN_DRONE_FC_EVENT_NONE;
+            main_state = OPEN_DRONE_FC_STATE_FAILSAFE;
         }
         else
         {
@@ -125,15 +140,12 @@ void OpenDrone_FC_Main(void)
         }
 
         break;
-    case OPEN_DRONE_FC_STATE_STOPPING:
+
+    case OPEN_DRONE_FC_STATE_FAILSAFE:
         PeriphEsc_Send(48, 48, 48, 48);
         hw_intf_delay_ms(4);
-
-        if (is_armed)
-        {
-            main_state = OPEN_DRONE_FC_STATE_RUNNING;
-        }
         break;
+        
     default:
         break;
     }
