@@ -67,6 +67,7 @@ OpenDrone_FC_Status_t PeriphRadio_Receive(uint8_t *data)
 {
 #ifdef USE_NRF24L01
 	uint8_t irq_level;
+	OpenDrone_FC_Status_t ret_status = OPENDRONE_FC_STATUS_FAILED;
 	OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg;
 
 	hw_intf_nrf24l01_get_irq(&irq_level);
@@ -80,6 +81,12 @@ OpenDrone_FC_Status_t PeriphRadio_Receive(uint8_t *data)
 			memcpy(data, (uint8_t *)&OpenDrone_TxProtocolMsg, CONFIG_NRF24L01_PAYLOAD_LEN);
 			nrf24l01_clear_rx_dr(nrf24l01_handle);
 		}
+
+		ret_status = OPENDRONE_FC_STATUS_SUCCESS;
+	}
+	else
+	{
+		ret_status = OPENDRONE_FC_STATUS_FAILED;
 	}
 #endif
 
@@ -87,5 +94,5 @@ OpenDrone_FC_Status_t PeriphRadio_Receive(uint8_t *data)
 	sx1278_lora_receive(sx1278_handle, data);
 #endif
 
-	return OPENDRONE_FC_STATUS_SUCCESS;
+	return ret_status;
 }
