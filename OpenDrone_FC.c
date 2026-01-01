@@ -28,6 +28,28 @@ uint8_t log_buf[128];
 uint32_t cyclic_task_ms[NUM_OF_TASK];
 #endif
 
+typedef enum
+{
+    OPEN_DRONE_FC_STATE_IDLE,
+    OPEN_DRONE_FC_STATE_ARMING,
+    OPEN_DRONE_FC_STATE_WATING_FOR_ARM,
+    OPEN_DRONE_FC_STATE_RUNNING,
+    OPEN_DRONE_FC_STATE_STOPPING
+} OpenDrone_FC_State_t;
+
+typedef enum
+{
+    OPEN_DRONE_FC_EVENT_NONE,
+    OPEN_DRONE_FC_EVENT_ARM,
+    OPEN_DRONE_FC_EVENT_DISARM
+} OpenDrone_FC_Event_t;
+
+OpenDrone_FC_Event_t new_event = OPEN_DRONE_FC_EVENT_NONE;
+static OpenDrone_FC_State_t main_state = OPEN_DRONE_FC_STATE_IDLE;
+static uint32_t arming_time_us = 5000000u;
+static uint32_t arming_start_time = 0u;
+
+static uint32_t current_time = 0;
 static uint32_t last_time_us[NUM_OF_TASK] = {0};
 
 static uint32_t last_rx_time_us = 0; // last time radio packet received
@@ -44,6 +66,7 @@ static stPeriphController_Output_t controller_output;
 
 static void OpenDrone_FC_PrintInfo(void);
 static void OpenDrone_FC_ParseRadioCommand(void);
+static void OpenDrone_FC_StateRunning(void);
 
 void OpenDrone_FC_Init(void)
 {
@@ -55,8 +78,71 @@ void OpenDrone_FC_Init(void)
 
 void OpenDrone_FC_Main(void)
 {
-    uint32_t current_time = hw_intf_get_time_us();
+    current_time = hw_intf_get_time_us();
+    OpenDrone_FC_Status_t rx_ret;
 
+    rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
+    if (rx_ret == OPENDRONE_FC_STATUS_SUCCESS)
+    {
+        OpenDrone_FC_ParseRadioCommand();
+    }
+
+    switch (main_state)
+    {
+    case OPEN_DRONE_FC_STATE_IDLE:
+        main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
+        break;
+
+    case OPEN_DRONE_FC_STATE_WATING_FOR_ARM:
+        if (new_event == OPEN_DRONE_FC_EVENT_ARM)
+        {
+            main_state = OPEN_DRONE_FC_STATE_ARMING;
+            arming_start_time = current_time;
+        }
+        break;
+
+    case OPEN_DRONE_FC_STATE_ARMING:
+        PeriphEsc_Send(48, 48, 48, 48);
+        hw_intf_delay_ms(4);
+
+        if ((current_time - arming_start_time) >= arming_time_us)
+        {
+            main_state = OPEN_DRONE_FC_STATE_RUNNING;
+            is_armed = 1;
+        }
+
+        break;
+
+    case OPEN_DRONE_FC_STATE_RUNNING:
+        if (new_event == OPEN_DRONE_FC_EVENT_DISARM)
+        {
+            main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
+            is_armed = 0;
+        }
+        else
+        {
+            OpenDrone_FC_StateRunning();
+        }
+
+        break;
+    case OPEN_DRONE_FC_STATE_STOPPING:
+        PeriphEsc_Send(48, 48, 48, 48);
+        hw_intf_delay_ms(4);
+
+        if (is_armed)
+        {
+            main_state = OPEN_DRONE_FC_STATE_RUNNING;
+        }
+        break;
+    default:
+        break;
+    }
+
+
+}
+
+static void OpenDrone_FC_StateRunning(void)
+{
     /* Task high */
     if ((current_time - last_time_us[IDX_TASK_HIGH]) >= DURATION_TASK_HIGH)
     {
@@ -64,32 +150,14 @@ void OpenDrone_FC_Main(void)
         PeriphIMU_UpdateGyro();
         PeriphIMU_UpdateFilter();
 
-        int rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
-        if (rx_ret > 0)
-        {
-            last_rx_time_us = hw_intf_get_time_us();
-        }
-
-        if ((current_time - last_rx_time_us) > RADIO_TIMEOUT_US)
-        {
-            /* Radio timeout: disarm */
-            is_armed = 0;
-            rc_angle_roll   = 0;
-            rc_angle_pitch  = 0;
-            rc_rate_yaw    	= 0;
-            rc_throttle     = 0;
-        }
-
-        OpenDrone_FC_ParseRadioCommand();
-
         /* Read angle in deg */
         PeriphIMU_GetAngel(&measured_angle_roll, &measured_angle_pitch, &measured_angle_yaw);
 
         /* Read gyro in deg/s */
         PeriphIMU_GetGyro(&measured_rate_roll, &measured_rate_pitch, &measured_rate_yaw);
 
-        controller_input.rc_angle_roll        	= rc_angle_roll;
-        controller_input.rc_angle_pitch        	= rc_angle_pitch;
+        controller_input.rc_angle_roll          = rc_angle_roll;
+        controller_input.rc_angle_pitch         = rc_angle_pitch;
         controller_input.rc_rate_yaw            = rc_rate_yaw;
         controller_input.rc_throttle            = rc_throttle;
         controller_input.measured_angle_roll    = measured_angle_roll;
@@ -101,19 +169,11 @@ void OpenDrone_FC_Main(void)
 
         PeriphController_Update(&controller_input, &controller_output);
 
-        if (is_armed)
-        {
-            /* Only send if armed */
-            PeriphEsc_Send(controller_output.dshot_m1,
-                           controller_output.dshot_m2,
-                           controller_output.dshot_m3,
-                           controller_output.dshot_m4);
-        }
-        else
-        {
-            /* Disarmed: send idle (48) to keep ESC alive but motors stopped */
-            PeriphEsc_Send(48, 48, 48, 48);
-        }
+        PeriphEsc_Send(
+            48 + controller_output.dshot_m1,
+            48 + controller_output.dshot_m2,
+            48 + controller_output.dshot_m3,
+            48 + controller_output.dshot_m4);
 
         cyclic_task_ms[IDX_TASK_HIGH] = current_time - last_time_us[IDX_TASK_HIGH];
         last_time_us[IDX_TASK_HIGH] = current_time;
@@ -158,17 +218,17 @@ static void OpenDrone_FC_ParseRadioCommand(void)
     case OPENDRONE_TXPROTOCOLMSG_ID_ARM_DISARM:
         if (OpenDrone_TxProtocolMsg.Payload.ArmDisarm.arm == 1)
         {
-            is_armed = 1;
+            new_event = OPEN_DRONE_FC_EVENT_ARM;
         }
         else
         {
-            is_armed = 0;
-        }   
+            new_event = OPEN_DRONE_FC_EVENT_DISARM;
+        }
         break;
     case OPENDRONE_TXPROTOCOLMSG_ID_STABILIZER_CONTROL:
         rc_angle_roll   = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.roll;
         rc_angle_pitch  = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.pitch;
-        rc_rate_yaw    	= OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
+        rc_rate_yaw     = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.yaw;
         rc_throttle     = OpenDrone_TxProtocolMsg.Payload.StabilizerCtrl.throttle;
         break;
     default:
