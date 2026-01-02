@@ -32,7 +32,7 @@ extern "C" {
 #include "qmc5883l.h"
 #include "nrf24l01.h"
 #include "esc_dshot.h"
-#include "OpenDrone_FC_Define.h"
+#include "OpenDrone_FC_Config.h"
 
 uint32_t hw_intf_get_time_us(void);
 void hw_intf_delay_ms(uint32_t time_ms);

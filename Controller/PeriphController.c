@@ -1,5 +1,5 @@
 #include "pid_controller.h"
-#include "OpenDrone_FC_Define.h"
+#include "OpenDrone_FC_Config.h"
 #include "PeriphController.h"
 
 #define LOOP_DT                     0.004f
@@ -7,10 +7,10 @@
 
 // RC -> desired mapping
 // Adjust these scales depending on your RC value ranges
-#define RC_ROLL_SCALE_DEG           10.0f   // stick full => +/- 10 degrees
-#define RC_PITCH_SCALE_DEG          10.0f   // stick full => +/- 10 degrees
-#define RC_YAW_SCALE_DPS            10.0f   // stick full => +/- 10 deg/s
-#define RATE_TO_MOTOR_SCALE         0.60f   // tune: 0.2..0.6 typical
+#define RC_ROLL_SCALE_DEG           5.0f   // stick full => +/- 10 degrees
+#define RC_PITCH_SCALE_DEG          5.0f   // stick full => +/- 10 degrees
+#define RC_YAW_SCALE_DPS            5.0f   // stick full => +/- 10 deg/s
+#define RATE_TO_MOTOR_SCALE         0.50f   // tune: 0.2..0.6 typical
 
 // Motor output range (example): 1000..2000 use floats 0..1000, adapt to your ESC interface
 #define MOTOR_MIN                   0.0f
@@ -61,9 +61,9 @@ void PeriphController_Init(void)
 {
 	// Outer angle PID config (produces desired rate in deg/s typically)
 	pid_controller_cfg_t cfg_angle = {
-		.kp = 12.0f,
+		.kp = 3.0f,
 		.ki = 0.02f,
-		.kd = 5.0f,
+		.kd = 1.0f,
 		.tau = 0.02f,
 		.lim_min = -200.0f,
 		.lim_max = 200.0f,
@@ -79,7 +79,7 @@ void PeriphController_Init(void)
 
 	// Inner rate PID config (works on angular rates)
 	pid_controller_cfg_t cfg_rate = {
-		.kp = 0.8f,
+		.kp = 0.008f,
 		.ki = 0.01f,
 		.kd = 0.001f,
 		.tau = 0.02f,

@@ -2,7 +2,7 @@
 #include "string.h"
 
 #include "OpenDrone_FC.h"
-#include "OpenDrone_FC_Define.h"
+#include "OpenDrone_FC_Config.h"
 #include "OpenDrone_FC_HwIntf.h"
 #include "OpenDrone_TxProtocol.h"
 #include "PeriphController.h"
@@ -25,7 +25,6 @@
 
 #ifdef USE_SERIAL_DEBUG
 uint8_t log_buf[128];
-uint32_t cyclic_task_ms[NUM_OF_TASK];
 #endif
 
 typedef enum
@@ -50,6 +49,7 @@ OpenDrone_FC_Event_t new_event = OPEN_DRONE_FC_EVENT_NONE;
 static OpenDrone_FC_State_t main_state = OPEN_DRONE_FC_STATE_IDLE;
 static uint32_t arming_time_us = 5000000u;
 static uint32_t arming_start_time = 0u;
+uint32_t cyclic_task_ms[NUM_OF_TASK];
 
 static uint32_t current_time = 0;
 static uint32_t last_time_us[NUM_OF_TASK] = {0};
@@ -168,9 +168,12 @@ static void OpenDrone_FC_StateRunning(void)
         /* Read gyro in deg/s */
         PeriphIMU_GetGyro(&measured_rate_roll, &measured_rate_pitch, &measured_rate_yaw);
 
-        controller_input.rc_angle_roll          = rc_angle_roll;
-        controller_input.rc_angle_pitch         = rc_angle_pitch;
-        controller_input.rc_rate_yaw            = rc_rate_yaw;
+        controller_input.rc_angle_roll          = 500;
+        controller_input.rc_angle_pitch         = 500;
+        controller_input.rc_rate_yaw            = 500;
+//        controller_input.rc_angle_roll          = rc_angle_roll;
+//        controller_input.rc_angle_pitch         = rc_angle_pitch;
+//        controller_input.rc_rate_yaw            = rc_rate_yaw;
         controller_input.rc_throttle            = rc_throttle;
         controller_input.measured_angle_roll    = measured_angle_roll;
         controller_input.measured_angle_pitch   = measured_angle_pitch;
@@ -180,12 +183,7 @@ static void OpenDrone_FC_StateRunning(void)
         controller_input.measured_rate_yaw      = measured_rate_yaw;
 
         PeriphController_Update(&controller_input, &controller_output);
-
-        PeriphEsc_Send(
-            48 + controller_output.dshot_m1,
-            48 + controller_output.dshot_m2,
-            48 + controller_output.dshot_m3,
-            48 + controller_output.dshot_m4);
+        PeriphEsc_Send(controller_output.dshot_m1, controller_output.dshot_m2, controller_output.dshot_m3, controller_output.dshot_m4);
 
         cyclic_task_ms[IDX_TASK_HIGH] = current_time - last_time_us[IDX_TASK_HIGH];
         last_time_us[IDX_TASK_HIGH] = current_time;
@@ -203,8 +201,8 @@ static void OpenDrone_FC_StateRunning(void)
     if ((current_time - last_time_us[IDX_TASK_LOW]) >= DURATION_TASK_LOW)
     {
         PeriphIMU_UpdateMag();
-        PeriphIMU_UpdateBaro();
-        PeriphIMU_UpdateFilterHeight();
+        // PeriphIMU_UpdateBaro();
+        // PeriphIMU_UpdateFilterHeight();
 
         cyclic_task_ms[IDX_TASK_LOW] = current_time - last_time_us[IDX_TASK_LOW];
 

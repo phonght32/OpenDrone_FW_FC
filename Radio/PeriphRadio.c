@@ -1,6 +1,6 @@
 #include "string.h"
 #include "PeriphRadio.h"
-#include "OpenDrone_FC_Define.h"
+#include "OpenDrone_FC_Config.h"
 #include "OpenDrone_FC_HwIntf.h"
 #include "OpenDrone_TxProtocol.h"
 #include "nrf24l01.h"

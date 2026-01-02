@@ -7,7 +7,7 @@
 #include "imu_madgwick.h"
 #include "kalman_height_estimation.h"
 #include "PeriphIMU.h"
-#include "OpenDrone_FC_Define.h"
+#include "OpenDrone_FC_Config.h"
 #include "OpenDrone_FC_HwIntf.h"
 
 typedef struct {
