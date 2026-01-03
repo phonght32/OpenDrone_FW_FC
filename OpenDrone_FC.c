@@ -180,12 +180,9 @@ void OpenDrone_FC_Main(void)
                 /* Read gyro in deg/s */
                 PeriphIMU_GetGyro(&measured_rate_roll, &measured_rate_pitch, &measured_rate_yaw);
 
-                controller_input.rc_angle_roll          = 500;
-                controller_input.rc_angle_pitch         = 500;
-                controller_input.rc_rate_yaw            = 500;
-                // controller_input.rc_angle_roll          = rc_angle_roll;
-                // controller_input.rc_angle_pitch         = rc_angle_pitch;
-                // controller_input.rc_rate_yaw            = rc_rate_yaw;
+                controller_input.rc_angle_roll          = rc_angle_roll;
+                controller_input.rc_angle_pitch         = rc_angle_pitch;
+                controller_input.rc_rate_yaw            = rc_rate_yaw;
                 controller_input.rc_throttle            = rc_throttle;
                 controller_input.measured_angle_roll    = measured_angle_roll;
                 controller_input.measured_angle_pitch   = measured_angle_pitch;
