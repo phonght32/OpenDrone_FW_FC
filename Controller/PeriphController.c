@@ -61,10 +61,10 @@ void PeriphController_Init(void)
 {
 	// Outer angle PID config (produces desired rate in deg/s typically)
 	pid_controller_cfg_t cfg_angle = {
-		.kp = 3.0f,
+		.kp = 0.3f,
 		.ki = 0.02f,
-		.kd = 1.0f,
-		.tau = 0.02f,
+		.kd = 0.08f,
+		.tau = 0.00f,
 		.lim_min = -200.0f,
 		.lim_max = 200.0f,
 		.int_lim_min = -100.0f,
