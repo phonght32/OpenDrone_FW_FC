@@ -39,7 +39,7 @@ extern "C" {
 #define USE_QMC5883L
 #define USE_BMP280
 
-// #define USE_ESC_DSHOT
+#define USE_ESC_DSHOT
 
 // #define USE_IMU_MADGWICK_6DOF
 #define USE_IMU_MADGWICK_9DOF
