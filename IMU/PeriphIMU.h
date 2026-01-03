@@ -30,6 +30,7 @@ extern "C" {
 #include "stdint.h"
 
 void PeriphIMU_Init(void);
+void PeriphIMU_Calibrate(void);
 void PeriphIMU_UpdateAccel(void);
 void PeriphIMU_UpdateGyro(void);
 void PeriphIMU_UpdateMag(void);

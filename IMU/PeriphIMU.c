@@ -80,7 +80,6 @@ void PeriphIMU_Init(void)
 	};
 	mpu6050_set_config(mpu6050_handle, mpu6050_cfg);
 	mpu6050_config(mpu6050_handle);
-	mpu6050_auto_calib(mpu6050_handle);
 #endif
 
 #ifdef USE_ICM42688
@@ -124,7 +123,6 @@ void PeriphIMU_Init(void)
 	};
 	hmc5883l_set_config(hmc5883l_handle, hmc5883l_cfg);
 	hmc5883l_config(hmc5883l_handle);
-	hmc5883l_auto_calib(hmc5883l_handle);
 #endif
 
 #ifdef USE_QMC5883L
@@ -190,6 +188,18 @@ void PeriphIMU_Init(void)
 	kalman_height_estimation_config(kalman_height_estimation_handle);
 #endif
 }
+
+void PeriphIMU_Calibrate(void)
+{
+#ifdef USE_MPU6050
+	mpu6050_auto_calib(mpu6050_handle);
+#endif
+
+#ifdef USE_ICM42688
+	icm42688_auto_calib(icm42688_handle, 2000, 1);
+#endif
+}
+
 
 void PeriphIMU_UpdateAccel(void)
 {

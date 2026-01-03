@@ -10,10 +10,11 @@
 #include "PeriphIMU.h"
 #include "PeriphRadio.h"
 
-
+#define DURATION_POWERING_ON        3000000U
 #define DURATION_READ_IMU           4000U
 #define DURATION_PRINT_DEBUG        200000U
 #define DURATION_UPDATE_MAG         50000U
+#define DURATION_RUN_CONTROLLER     4000U
 #define TIME_ARMING                 4000000U
 #define RADIO_TIMEOUT_US            1000000U
 
@@ -24,6 +25,8 @@ uint8_t log_buf[128];
 typedef enum
 {
     OPEN_DRONE_FC_STATE_IDLE,
+    OPEN_DRONE_FC_STATE_POWERING_ON,
+    OPEN_DRONE_FC_STATE_CALIBRATING_IMU,
     OPEN_DRONE_FC_STATE_ARMING,
     OPEN_DRONE_FC_STATE_WATING_FOR_ARM,
     OPEN_DRONE_FC_STATE_RUNNING,
@@ -40,18 +43,21 @@ typedef enum
 } OpenDrone_FC_Event_t;
 
 
-static OpenDrone_FC_State_t main_state = OPEN_DRONE_FC_STATE_IDLE;
+static OpenDrone_FC_State_t main_state = OPEN_DRONE_FC_STATE_POWERING_ON;
 static OpenDrone_FC_Event_t new_event = OPEN_DRONE_FC_EVENT_NONE;
 
 static uint32_t current_time = 0;
 
 static uint32_t start_time_arming = 0u;
+static uint32_t start_time_powering_on = 0u;
 
 static uint32_t last_time_recv_radio = 0; // last time radio packet received
 static uint32_t last_time_read_imu = 0;
 static uint32_t last_time_print_debug = 0;
 static uint32_t last_time_update_mag = 0;
+static uint32_t last_time_run_controller = 0;
 static uint8_t is_armed = 0; // simple arming flag, handle with care in your system
+static uint8_t is_imu_calibrated = 0;
 
 static OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 static int16_t rc_angle_roll, rc_angle_pitch, rc_rate_yaw, rc_throttle;
@@ -91,9 +97,43 @@ void OpenDrone_FC_Main(void)
         new_event = OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT;
     }
 
+    if (is_imu_calibrated == 1)
+    {
+        if ((current_time - last_time_update_mag) >= DURATION_UPDATE_MAG)
+        {
+            PeriphIMU_UpdateMag();
+
+            last_time_update_mag = current_time;
+        }
+
+        /* Handle IMU data */
+        if ((current_time - last_time_read_imu) >= DURATION_READ_IMU)
+        {
+            PeriphIMU_UpdateAccel();
+            PeriphIMU_UpdateGyro();
+            PeriphIMU_UpdateFilter();
+
+            last_time_read_imu = current_time;
+        }
+    }
+
     switch (main_state)
     {
     case OPEN_DRONE_FC_STATE_IDLE:
+        main_state = OPEN_DRONE_FC_STATE_POWERING_ON;
+        start_time_powering_on = current_time;
+        break;
+
+    case OPEN_DRONE_FC_STATE_POWERING_ON:
+        if ((current_time - start_time_powering_on) >= DURATION_POWERING_ON)
+        {
+            main_state = OPEN_DRONE_FC_STATE_CALIBRATING_IMU;
+        }
+        break;
+    
+    case OPEN_DRONE_FC_STATE_CALIBRATING_IMU:
+        PeriphIMU_Calibrate();
+        is_imu_calibrated = 1;
         main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
         break;
 
@@ -132,20 +172,8 @@ void OpenDrone_FC_Main(void)
         }
         else
         {
-            if ((current_time - last_time_update_mag) >= DURATION_UPDATE_MAG)
+            if ((current_time - last_time_run_controller) >= DURATION_RUN_CONTROLLER)
             {
-                PeriphIMU_UpdateMag();
-
-                last_time_update_mag = current_time;
-            }
-
-            /* Handle IMU data */
-            if ((current_time - last_time_read_imu) >= DURATION_READ_IMU)
-            {
-                PeriphIMU_UpdateAccel();
-                PeriphIMU_UpdateGyro();
-                PeriphIMU_UpdateFilter();
-
                 /* Read angle in deg */
                 PeriphIMU_GetAngel(&measured_angle_roll, &measured_angle_pitch, &measured_angle_yaw);
 
@@ -169,7 +197,7 @@ void OpenDrone_FC_Main(void)
                 PeriphController_Update(&controller_input, &controller_output);
                 PeriphEsc_Send(controller_output.dshot_m1, controller_output.dshot_m2, controller_output.dshot_m3, controller_output.dshot_m4);
 
-                last_time_read_imu = current_time;
+                last_time_run_controller = current_time;
             }
         }
 
