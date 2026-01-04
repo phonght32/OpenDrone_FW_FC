@@ -225,7 +225,7 @@ void PeriphIMU_UpdateAccel(void)
 	// imu_data.accel_z = accel_z;
 
 	imu_data.accel_x = accel_y;
-	imu_data.accel_y = accel_x;
+	imu_data.accel_y = -accel_x;
 	imu_data.accel_z = -accel_z;
 
 #ifdef USE_SERIAL_DEBUG
@@ -256,9 +256,9 @@ void PeriphIMU_UpdateGyro(void)
 	// imu_data.gyro_y = gyro_y;
 	// imu_data.gyro_z = gyro_z;
 
-	imu_data.gyro_x = gyro_y;
+	imu_data.gyro_x = -gyro_y;
 	imu_data.gyro_y = gyro_x;
-	imu_data.gyro_z = -gyro_z;
+	imu_data.gyro_z = gyro_z;
 }
 
 void PeriphIMU_UpdateMag(void)
