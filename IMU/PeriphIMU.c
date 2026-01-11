@@ -196,7 +196,7 @@ void PeriphIMU_Calibrate(void)
 #endif
 
 #ifdef USE_ICM42688
-	icm42688_auto_calib(icm42688_handle, 2000, 1);
+	icm42688_auto_calib(icm42688_handle, 800, 1);
 #endif
 }
 
