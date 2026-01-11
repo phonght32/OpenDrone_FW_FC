@@ -90,6 +90,8 @@ esc_dshot_status_t hw_intf_bl_esc_dshot_send_dma(uint32_t *packet_dma);
 esc_dshot_status_t hw_intf_br_esc_dshot_send_dma(uint32_t *packet_dma);
 #endif
 
+void hw_intf_led1_set(uint8_t level);
+
 #ifdef __cplusplus
 }
 #endif
