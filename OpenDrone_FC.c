@@ -58,6 +58,7 @@ static uint32_t last_time_update_mag = 0;
 static uint32_t last_time_run_controller = 0;
 static uint8_t is_armed = 0; // simple arming flag, handle with care in your system
 static uint8_t is_imu_calibrated = 0;
+static uint8_t is_radio_received = 0;
 
 static OpenDrone_TxProtocolMsg_t OpenDrone_TxProtocolMsg = {0};
 static int16_t rc_angle_roll, rc_angle_pitch, rc_rate_yaw, rc_throttle;
@@ -88,13 +89,19 @@ void OpenDrone_FC_Main(void)
     rx_ret = PeriphRadio_Receive((uint8_t *)&OpenDrone_TxProtocolMsg);
     if (rx_ret == OPENDRONE_FC_STATUS_SUCCESS)
     {
+        if (is_radio_received == 0)
+        {
+            is_radio_received = 1;
+        }
+
         last_time_recv_radio = current_time;
         OpenDrone_FC_ParseRadioCommand();
     }
 
-    if ((current_time - last_time_recv_radio) >= RADIO_TIMEOUT_US)
+    if ((is_radio_received == 1) && ((current_time - last_time_recv_radio) >= RADIO_TIMEOUT_US))
     {
-        new_event = OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT;
+        main_state = OPEN_DRONE_FC_STATE_FAILSAFE;
+        hw_intf_led1_set(0);
     }
 
     if (is_imu_calibrated == 1)
@@ -130,10 +137,11 @@ void OpenDrone_FC_Main(void)
             main_state = OPEN_DRONE_FC_STATE_CALIBRATING_IMU;
         }
         break;
-    
+
     case OPEN_DRONE_FC_STATE_CALIBRATING_IMU:
         PeriphIMU_Calibrate();
         is_imu_calibrated = 1;
+        hw_intf_led1_set(1);
         main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
         break;
 
@@ -165,15 +173,13 @@ void OpenDrone_FC_Main(void)
             main_state = OPEN_DRONE_FC_STATE_WATING_FOR_ARM;
             is_armed = 0;
         }
-        else if (new_event == OPEN_DRONE_FC_EVENT_RADIO_TIMEOUT)
-        {
-            new_event = OPEN_DRONE_FC_EVENT_NONE;
-            main_state = OPEN_DRONE_FC_STATE_FAILSAFE;
-        }
         else
         {
             if ((current_time - last_time_run_controller) >= DURATION_RUN_CONTROLLER)
             {
+                // sprintf((char *)log_buf, "%d\n", current_time - last_time_run_controller);
+                // hw_intf_uart_debug_send(log_buf, strlen((char*)log_buf));
+
                 /* Read angle in deg */
                 PeriphIMU_GetAngel(&measured_angle_roll, &measured_angle_pitch, &measured_angle_yaw);
 
@@ -244,6 +250,7 @@ static void OpenDrone_FC_ParseRadioCommand(void)
 
 static void OpenDrone_FC_PrintInfo(void)
 {
+#ifdef USE_SERIAL_DEBUG
     /* Send debug 9-DoF */
     // float debug_accel_x, debug_accel_y, debug_accel_z, debug_gyro_x,
     //       debug_gyro_y, debug_gyro_z, debug_mag_x, debug_mag_y, debug_mag_z;
@@ -285,4 +292,12 @@ static void OpenDrone_FC_PrintInfo(void)
     //         OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.pitch,
     //         OpenDrone_TxProtocol_Msg.Payload.StabilizerCtrl.yaw);
     // hw_intf_uart_debug_send(log_buf, (uint16_t)strlen((char*)log_buf));
+
+    // sprintf((char *)log_buf, "\nm1: %d\tm2: %d\tm3: %d\tm4: %d",
+    //         controller_output.dshot_m1,
+    //         controller_output.dshot_m2,
+    //         controller_output.dshot_m3,
+    //         controller_output.dshot_m4);
+    // hw_intf_uart_debug_send(log_buf, (uint16_t)strlen((char*)log_buf));
+#endif
 }
